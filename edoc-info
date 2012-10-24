@@ -1,0 +1,4 @@
+{application,eipmi}.
+{packages,[]}.
+{modules,[eipmi,eipmi_auth,eipmi_decoder,eipmi_encoder,eipmi_request,
+          eipmi_response,eipmi_session,eipmi_util]}.
