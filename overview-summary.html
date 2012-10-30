@@ -2,74 +2,134 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>EIPMI - A native Erlang IMPI library
-</title>
+<title>EIPMI - A native Erlang IMPI library</title>
 <link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
 </head>
 <body bgcolor="white">
 <div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<h1>EIPMI - A native Erlang IMPI library
-</h1>
-<p>Copyright © 2012 Lindenbaum GmbH</p>
-<p><b>Version:</b> 1.0.0</p>
-<p><b>Authors:</b> Tobias Schlager (<a href="mailto:tobias.schlager@lindenbaum.eu"><tt>tobias.schlager@lindenbaum.eu</tt></a>), Olle Toernstroem (<a href="mailto:olle.toernstroem@lindenbaum.eu"><tt>olle.toernstroem@lindenbaum.eu</tt></a>).</p>
+<h1>EIPMI - A native Erlang IMPI library</h1>
+<p>Copyright © 2012 Lindenbaum GmbH
+</p>
 
 
-<h3><a name="Summary">Summary</a></h3>
+<h3><a name="EIPMI">EIPMI</a></h3>
 
-<p>EIPMI is a native Erlang/OTP library application for RMCP/IPMI 1.5. It
-implements the remote console part of the IPMI over LAN interface, as specified
-<a href="http://www.intel.com/design/servers/ipmi/spec.htm"><tt>here</tt></a>.</p>
+<p>EIPMI is a native Erlang/OTP library application for RMCP/IPMI 1.5. The goal is
+to implement the remote console part of the IPMI LAN interface, as specified
+here <a href="http://www.intel.com/design/servers/ipmi/spec.htm" target="_top"><tt>http://www.intel.com/design/servers/ipmi/spec.htm</tt></a>. We would like to
+provide a low threshold for learning and using EIPMI, aiming to make it fit well
+with other Erlang/OTP concepts and solutions.</p>
 
-<h3><a name="Usage">Usage</a></h3>
+<h4><a name="Initial_planned_features">Initial planned features</a></h4>
 
-<p>If you are using <a href="http://github.com/basho/rebar"><tt>rebar</tt></a> to
-build your project and want to use EIPMI just specify it as a dependency in your
-<code>rebar.config</code> (please note that the below link will change in the future as
-soon as EIPMI gets released for the first time).</p>
+<p><li> Simple API and user work-flow</li>
+<li> Extensible design, open for contributions</li>
+<li> RMCP presence ping/pong</li>
+<li> Session initiation and activation</li>
+<li> Some basic IPMI queries</li>
+<li> Support for LAN alerts (events)</li></p>
+
+<p>We really want to provide a simple enough basic implementation, that is open
+for extension, and not going for a complete coverage of the specification right
+away - that should be added by the community as the needs appear.</p>
+
+<h4><a name="Contributing">Contributing</a></h4>
+
+<p>If you whish to contribute fixes or enhancements, please make your code look
+nice, for example using the Emacs Erlang-mode, formatting your code before
+committing. Also, you should always write proper <code>edoc</code> module documentation.
+When writing documentation, please try to keep the tone simple and on a higher
+abstraction level, so that users may understand the concepts without having to
+know too much of the standard.</p>
+
+<p>The modules <code>eipmi_request</code> and <code>eipmi_response</code> are a starting point for
+developers that want add support for not yet implemented request/response pairs.
+To add support for a new request the encoding of the corresponding IPMI data
+part needs to be added to the <code>eipmi_request</code> module. To add support for a new
+response the decoding of the corresponding IPMI data part needs to be added to
+the <code>eipmi_response</code> module. As soon as encoding and decoding is implemented the
+command is ready to be issued using <code>eipmi:raw/4</code>. For features that need to
+combine multiple requests (e.g. reading the FRU) it would be even more nice to
+add a corresponding frontend API function to the <code>eipmi</code> module.</p>
+
+<h4><a name="Documentation">Documentation</a></h4>
+
+<p>The following sections will give a brief description of the EIPMI features as
+well as some usage examples for developers integrating the application into
+their project. Additional information can be found in the projects EDoc
+documentation located under <a href="http://lindenbaum.github.com/eipmi/" target="_top"><tt>http://lindenbaum.github.com/eipmi/</tt></a>.</p>
+
+<h4><a name="Sessions_&amp;_Authentication">Sessions &amp; Authentication</a></h4>
+
+<p>EIPMI does all the necessary session handling for the user as soon as a session
+is requested using <code>eipmi:open/1</code> or <code>eipmi:open/2</code>. However, according to the
+capabilities of the target BMC the user eventually has to pass in user and
+password credentials using the <code>Options</code> argument of <code>eipmi:open/2</code>.</p>
+
+<p>All authentication mechanism mentioned in the specification are supported,
+including <em>anonymous</em>, <em>null user</em> and <em>non-null user</em>. Additionally, all
+digester algorithms proposed by the specification are supported.</p>
+
+<p>In case the target BMC only supports <em>non-null</em> users the options <code>user</code> and
+<code>password</code> need to be passed to a call to <code>eipmi:open/2</code>. In case <em>null users</em>
+are configured on the BMC only the <code>password</code> option will be required. If the
+BMC supports <em>anonymous</em> logins no options need to be set.</p>
+
+<p>A session may be shared between mutliple processes. While the requests of one
+process will be synchronous and thus ordered, requests from different processes
+will not block each other. However, flow control is performed over all requests
+of a session. If a maximum of 64 pending requests is reached new requests will
+be queued and sent as pending requests get completed.</p>
+
+<h4><a name="Building">Building</a></h4>
+
+<p>If you are using <a href="http://github.com/basho/rebar">rebar</a> to build your project
+and want to use EIPMI just specify it as a dependency in your <code>rebar.config</code>
+(please note that the below link will change in the future as soon as EIPMI gets
+released for the first time).</p>
 
 <pre>{deps,
  [{eipmi, "1.0.0", {git, "https://github.com/lindenbaum/eipmi.git"}}]}.</pre>
 
-<p>The following snippet shows an example usage of the EIPMI application:</p>
+<h4><a name="Usage">Usage</a></h4>
 
-<pre>%% IPMI device discovery
-case eipmi:ping("10.1.31.11") of
+<p>IPMI device discovery usually starts with a PING message to the target host:</p>
+
+<pre>case eipmi:ping("10.1.31.11") of
      pong -&gt;
-          {ok, Session} = eipmi:open("10.1.31.11"),
-          ...
-          %% issue requests
-          ...
-          eipmi:close(Session);
+          ipmi_supported;
      pang -&gt;
           ipmi_not_supported
-end</pre>
+end,</pre>
 
-<h3><a name="Sessions">Sessions</a></h3>
+<p>After successful device discovery an actual session can be opened. This example
+will open a session, read the FRU with id 253 and close the session again.</p>
 
-<p>EIPMI does all the necessary session handling for the user as soon as a session
-is requested using <a href="eipmi.html#open-1"><code>eipmi:open/1</code></a> or <a href="eipmi.html#open-2"><code>eipmi:open/2</code></a>. However,
-according to the capabilities of the target BMC the user eventually has to pass
-in user and password credentials using the <code>Options</code> argument of
-<a href="eipmi.html#open-2"><code>eipmi:open/2</code></a>. Refer to section <a href="#Authentication">Authentication</a> for more
-information.</p>
+<pre>{ok, Session} = eipmi:open("10.1.31.11"),
+{ok, FruInfo} = eipmi:read_fru(Session, 253),
+BoardArea = proplists:get_value(board_area, FruInfo),
+Name = proplists:get_value(name, BoardArea),
+Serial = proplists:get_value(serial_number, BoardArea),
+error_logger:info_msg("Board ~s has serial number ~s.~n", [Name, Serial]),
+eipmi:close(Session),</pre>
 
-<h4><a name="Authentication">Authentication</a></h4>
+<p>EIPMI also allows to send <em>raw</em> requests over a session. However, raw does not
+mean that binary data can be sent directly. The corresponding request/response
+encode/decode functionality must be present. The following snippet will issue
+the <em>Set Session Privilege Level</em> command, trying to set the current session
+privilege to <code>administrator</code>.</p>
 
-<p>All standardized authentication mechanism are supported, including
-<em>anonymous</em>, <em>null user</em> and <em>non-null user</em>. Additionally,
-all standardized digester algorithms are supported.</p>
-
-<p>In case the target BMC only supports <em>non-null</em> users the options <code>user</code>
-and <code>password</code> need to be passed to a call to <a href="eipmi.html#open-2"><code>eipmi:open/2</code></a>. In case
-<em>null users</em> are configured on the BMC only the <code>password</code> option will
-be required. If the BMC supports <em>anonymous</em> logins no options need to be
-set.</p>
-
-<h3><a name="History">History</a></h3>
+<pre>{ok, Response} = eipmi:raw(Session, 16#06, 16#3b, [{privilege, administrator}]),
+NewPrivilege = proplists:get_value(privilege, Response),
+error_logger:info_msg("New privilege level is ~p.~n", [NewPrivilege]),</pre>
+<script>
+// Jump directly to a referenced url given in trailing '[]:...'-notation
+function goto(tag) { parent.document.location.href = url(tag); }
+function url(tag) { var o=document.getElementById(tag); return o ? o.href : '#'+tag; }
+</script>
 
 <hr>
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Oct 24 2012, 15:17:14.</i></p>
+<p><i>Generated by EDoc, Oct 30 2012, 11:35:46.</i></p>
 </body>
 </html>
