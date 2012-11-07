@@ -1,4 +1,5 @@
 {application,eipmi}.
 {packages,[]}.
 {modules,[eipmi,eipmi_auth,eipmi_decoder,eipmi_encoder,eipmi_fru,
-          eipmi_request,eipmi_response,eipmi_session,eipmi_util]}.
+          eipmi_request,eipmi_response,eipmi_sel,eipmi_sensor,eipmi_session,
+          eipmi_util]}.
