@@ -56,6 +56,10 @@ callback as well as the top level supervisor.</p>
 <p><b>abstract datatype</b>: <tt>session()</tt></p>
 
 
+<h3 class="typedecl"><a name="type-target">target()</a></h3>
+<p><tt>target() = {<a href="inet.html#type-ip_address">inet:ip_address()</a> | <a href="inet.html#type-hostname">inet:hostname()</a>, <a href="inet.html#type-port_number">inet:port_number()</a>}</tt></p>
+
+
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#close-1">close/1</a></td><td>
   Closes an IPMI session previously opened with <a href="#open-1"><code>open/1</code></a> or
@@ -90,7 +94,8 @@ callback as well as the top level supervisor.</p>
     <dt><code>{privilege, callback | user | operator | administrator}</code></dt>
     <dd>
       <p>
-      the requested privilege level for this session, default is <code>administrator</code>
+      the requested privilege level for this session, default is
+      <code>administrator</code>
       </p>
     </dd>
     <dt><code>{rq_addr, 16#81..16#8d}</code></dt>
@@ -124,7 +129,15 @@ callback as well as the top level supervisor.</p>
 <tr><td valign="top"><a href="#read_fru-2">read_fru/2</a></td><td>
   Return the FRU inventory data for a specific FRU id.</td></tr>
 <tr><td valign="top"><a href="#read_sel-2">read_sel/2</a></td><td>
-  TODO.</td></tr>
+  Return all currently available entries from the System Event Log (SEL).</td></tr>
+<tr><td valign="top"><a href="#stats-0">stats/0</a></td><td>
+  Returns statistical information about the currently opened sessions and the
+  registered event handlers.</td></tr>
+<tr><td valign="top"><a href="#subscribe-2">subscribe/2</a></td><td>
+  Registers/adds a handler for session related events.</td></tr>
+<tr><td valign="top"><a href="#unsubscribe-2">unsubscribe/2</a></td><td>
+  Unregisters/removes a handler for session related events previously added
+  using <a href="#subscribe-2"><code>subscribe/2</code></a>.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
@@ -182,7 +195,8 @@ required.</p>
     <dt><code>{privilege, callback | user | operator | administrator}</code></dt>
     <dd>
       <p>
-      the requested privilege level for this session, default is <code>administrator</code>
+      the requested privilege level for this session, default is
+      <code>administrator</code>
       </p>
     </dd>
     <dt><code>{rq_addr, 16#81..16#8d}</code></dt>
@@ -242,12 +256,65 @@ required.</p>
 
 <h3 class="function"><a name="read_sel-2">read_sel/2</a></h3>
 <div class="spec">
-<p><tt>read_sel(Session::<a href="#type-session">session()</a>, Clear::boolean()) -&gt; {ok, term()} | {error, term()}</tt><br></p>
+<p><tt>read_sel(Session::<a href="#type-session">session()</a>, Clear::boolean()) -&gt; {ok, [<a href="eipmi_sel.html#type-entry">eipmi_sel:entry()</a>]} | {error, term()}</tt><br></p>
 </div><p>
+  Return all currently available entries from the System Event Log (SEL). The
+  returned SEL entries are property lists that do only contain the available
+  and checksum error free fields of the respective entry. Using the second
+  argument the SEL can optionally be cleared after reading.
   TODO</p>
+
+<h3 class="function"><a name="stats-0">stats/0</a></h3>
+<div class="spec">
+<p><tt>stats() -&gt; [{sessions, [{<a href="#type-target">target()</a>, pid()}]} | {handlers, [module() | {module(), term()}]}]</tt><br></p>
+</div><p>
+  Returns statistical information about the currently opened sessions and the
+  registered event handlers.</p>
+
+<h3 class="function"><a name="subscribe-2">subscribe/2</a></h3>
+<div class="spec">
+<p><tt>subscribe(Handler::module() | {module(), term()}, Args::term()) -&gt; ok | {error, term()}</tt><br></p>
+</div><p>
+  Registers/adds a handler for session related events. The handler module must
+  implement the <a href="gen_event.html"><code>gen_event</code></a> behaviour. For more information on the
+  arguments <code>Handler</code> and <code>Args</code> refer to <a href="gen_event.html#add_handler-3"><code>gen_event:add_handler/3</code></a>.
+  The event handling module should be prepared to receive the following events
+  on the <code>handle_call/2</code> callback:
+  <dl>
+    <dt><code>{Session :: session(), established}</code></dt>
+    <dd>
+      <p>the session was successfully established and activated</p>
+    </dd>
+    <dt><code>{Session :: session(), {closed, Reason :: term()}}</code></dt>
+    <dd>
+      <p>the session was closed with the provided reason</p>
+    </dd>
+    <dt><code>{Session :: session(), {decode_error, Reason :: term()}}</code></dt>
+    <dd>
+      <p>a received packet could not be decoded</p>
+    </dd>
+    <dt><code>{Session :: session(), {request_timeout,
+                                 RqSeqNr :: non_neg_integer()}}</code></dt>
+    <dd>
+      <p>the corresponding request timed out</p>
+    </dd>
+    <dt><code>{Session :: session(), {no_requestor, {RqSeqNr :: non_neg_integer(),
+                                                Response}}}</code></dt>
+    <dd>
+      <p>no requestor could be found for the corresponding request</p>
+    </dd>
+  </dl></p>
+
+<h3 class="function"><a name="unsubscribe-2">unsubscribe/2</a></h3>
+<div class="spec">
+<p><tt>unsubscribe(Handler::module() | {module(), term()}, Args::term()) -&gt; term()</tt><br></p>
+</div><p>
+  Unregisters/removes a handler for session related events previously added
+  using <a href="#subscribe-2"><code>subscribe/2</code></a>. For more information refer to on the arguments
+  <a href="gen_event.html#delete_handler-3"><code>gen_event:delete_handler/3</code></a>.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Nov 7 2012, 13:48:09.</i></p>
+<p><i>Generated by EDoc, Nov 12 2012, 12:06:15.</i></p>
 </body>
 </html>
