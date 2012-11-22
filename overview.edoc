@@ -74,7 +74,50 @@ be queued and sent as pending requests get completed.
 
 === Asynchronous Events ===
 
-TODO
+The API of EIPMI has been designed to be as similar as possible to existing
+erlang protocol implementations (e.g. <code>gen_udp</code>). However, since sessions may be
+share between multiple processes it is not possible to send asynchronous events
+to a specific process.
+
+Therefore, EIPMI provides the possibility to distribute asynchronous events for
+all currently existing sessions through a <code>gen_event</code>. User can subscribe to
+EIPMI events using <code>eipmi:subscribe/2</code>. Subscription can be cancelled using
+<code>eipmi:unsubscribe/2</code>. The subscriber must implement the <code>gen_event</code> behaviour
+and be prepared to receive the following events on the <code>handle_event/2</code>
+callback:
+
+```
+{ipmi, Session &#183; eipmi:session(), established}
+'''
+The session was successfully established and activated.
+```
+{ipmi, Session &#183; eipmi:session(), {closed, Reason &#183; term()}}
+'''
+The session was closed with the provided reason.
+```
+{ipmi, Session &#183; eipmi:session(), {decode_error, Reason &#183; term()}}
+'''
+A received packet could not be decoded.
+```
+{ipmi, Session &#183; eipmi:session(), {timeout, RqSeqNr &#183; 0..63}}
+'''
+The corresponding request timed out.
+```
+{ipmi, Session &#183; eipmi:session(), {unhandled, {call, Request &#183; term()}}}
+'''
+The session received an invalid <code>gen_server</code> call.
+```
+{ipmi, Session &#183; eipmi:session(), {unhandled, {cast, Request &#183; term()}}}
+'''
+The session received an invalid <code>gen_server</code> cast.
+```
+{ipmi, Session &#183; eipmi:session(), {unhandled, {info, Info &#183; term()}}}
+'''
+The session received an invalid message.
+```
+{ipmi, Session &#183; eipmi:session(), {unhandled, {ipmi, {ok | error, term()}}}}
+'''
+The session received an IPMI response but no handler was found for it.
 
 === Building ===
 
