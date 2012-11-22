@@ -11,28 +11,33 @@
 
 <h1>Module eipmi_session</h1>
 <ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
-   A state machine providing session management for IPMI over lan channels.
+   A server providing session management for IPMI over lan channels.
 
-<p><b>Behaviours:</b> <a href="gen_fsm.html"><tt>gen_fsm</tt></a>.</p>
+<p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
 
 <h2><a name="description">Description</a></h2><p>
-   A state machine providing session management for IPMI over lan channels.
-   The session will be established as soon as the state machine gets started.
-   An established session will be closed when the state machine terminates.
-   The user can close the session using <a href="#stop-1"><code>stop/1</code></a>.</p>
+   A server providing session management for IPMI over lan channels. The
+   session will be established as soon as the server gets started. An
+   established session will be closed when the server terminates. The user
+   can close the session using <a href="#stop-1"><code>stop/1</code></a>.</p>
   
    <p>Synchronous requests can be issued over this session at any given time using
-   <a href="#request-3"><code>request/3</code></a>. When the session is not yet established requests will be
+   <a href="#rpc-3"><code>rpc/3</code></a>. When the session is not yet established requests will be
    queued and issued as soon as the far end (BMC) is ready. Request timeouts
    can be configured on state machine startup using the <code>timeout</code> property
    of the <code>Options</code> field.</p>
   
    <p>A session may be shared between mutliple processes. While the requests of   
 one process will be synchronous and thus ordered, requests from different   
-processes will not block each other. However, flow control is performed over   
-all requests of a session. If a maximum of 8 pending requests is reached   
-new requests will be queued and sent as pending requests get completed.</p>
+processes will not block each other. However, it should be mentioned that   
+a BMC is allowed to discard packets with a sequence number difference of 8.   
+Since the session does not (yet) provide any kind of flow control it is the   
+responsibility of the rpc-ing processes to care for the total number of   
+concurrent RPCs or to live with error/timeout returns.</p>
   
+   The server will handle the low level RMCP and IPMI protocol regarding
+   encoding and decoding of messages, as well as correct packet
+   acknowledgement, sequence number handling and session opening/closing.
    A session will use the modules <a href="eipmi_request.html"><code>eipmi_request</code></a> and
    <a href="eipmi_response.html"><code>eipmi_response</code></a> to encode and decode requests/responses. Therefore,
    there's no need to edit the session but extending these modules when
@@ -49,29 +54,33 @@ new requests will be queued and sent as pending requests get completed.</p>
 
 
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#request-3">request/3</a></td><td>
-  Send a synchronous IPMI request over this session.</td></tr>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#rpc-3">rpc/3</a></td><td>
+  Send a synchronous IPMI RPC over this session.</td></tr>
 <tr><td valign="top"><a href="#start_link-3">start_link/3</a></td><td>
-  Start a session state machine.</td></tr>
+  Starts a session server which in turn will occupy a free UDP socket.</td></tr>
 <tr><td valign="top"><a href="#stop-1">stop/1</a></td><td>
   Stop the server, close the session.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
 
-<h3 class="function"><a name="request-3">request/3</a></h3>
+<h3 class="function"><a name="rpc-3">rpc/3</a></h3>
 <div class="spec">
-<p><tt>request(Pid::pid(), Request::<a href="eipmi.html#type-request">eipmi:request()</a>, Properties::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; {ok, <a href="proplists.html#type-proplist">proplists:proplist()</a>} | {error, term()}</tt><br></p>
+<p><tt>rpc(Pid::pid(), Request::<a href="eipmi.html#type-request">eipmi:request()</a>, Properties::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; {ok, <a href="proplists.html#type-proplist">proplists:proplist()</a>} | {error, term()}</tt><br></p>
 </div><p>
-  Send a synchronous IPMI request over this session. If the session is not yet
+  Send a synchronous IPMI RPC over this session. If the session is not yet
   established the request will be queued.</p>
 
 <h3 class="function"><a name="start_link-3">start_link/3</a></h3>
 <div class="spec">
 <p><tt>start_link(Session::<a href="eipmi.html#type-session">eipmi:session()</a>, IPAddress::<a href="inet.html#type-ip_address">inet:ip_address()</a> | <a href="inet.html#type-hostname">inet:hostname()</a>, Options::[<a href="#type-property">property()</a>]) -&gt; {ok, pid()} | {error, term()}</tt><br></p>
 </div><p>
-  Start a session state machine. This will also setup a session by sending the
-  necessary IPMI protocol messages.</p>
+  Starts a session server which in turn will occupy a free UDP socket. The
+  provided IP address and network port will be used to send requests. This
+  means that the target for this session server is static and configured on
+  startup. This will also setup a session by sending the necessary IPMI
+  protocol messages. All requests received before the session is activated will
+  be queued and sent as soon as the session is established.</p>
 
 <h3 class="function"><a name="stop-1">stop/1</a></h3>
 <div class="spec">
@@ -81,6 +90,6 @@ new requests will be queued and sent as pending requests get completed.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Nov 20 2012, 11:29:25.</i></p>
+<p><i>Generated by EDoc, Nov 22 2012, 13:47:27.</i></p>
 </body>
 </html>
