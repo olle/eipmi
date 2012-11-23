@@ -28,6 +28,14 @@ callback as well as the top level supervisor.</p>
    feature should be put here.
 <h2><a name="types">Data Types</a></h2>
 
+<h3 class="typedecl"><a name="type-fru_info">fru_info()</a></h3>
+<p><tt>fru_info() = <a href="eipmi_fru.html#type-info">eipmi_fru:info()</a></tt></p>
+
+
+<h3 class="typedecl"><a name="type-fru_inventory">fru_inventory()</a></h3>
+<p><tt>fru_inventory() = [<a href="#type-fru_info">fru_info()</a>]</tt></p>
+
+
 <h3 class="typedecl"><a name="type-option">option()</a></h3>
 <p><tt>option() = {initial_outbound_seq_nr, non_neg_integer()} | {password, string()} | {port, <a href="inet.html#type-port_number">inet:port_number()</a>} | {privilege, callback | user | operator | administrator} | {rq_addr, 129..141} | {timeout, non_neg_integer()} | {user, string()}</tt></p>
 
@@ -50,6 +58,18 @@ callback as well as the top level supervisor.</p>
 
 <h3 class="typedecl"><a name="type-response">response()</a></h3>
 <p><tt>response() = {<a href="#type-resp_net_fn">resp_net_fn()</a>, Command::0..255}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-sdr">sdr()</a></h3>
+<p><tt>sdr() = <a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a></tt></p>
+
+
+<h3 class="typedecl"><a name="type-sdr_repository">sdr_repository()</a></h3>
+<p><tt>sdr_repository() = [<a href="#type-sdr">sdr()</a>]</tt></p>
+
+
+<h3 class="typedecl"><a name="type-sel_entry">sel_entry()</a></h3>
+<p><tt>sel_entry() = <a href="eipmi_sel.html#type-entry">eipmi_sel:entry()</a></tt></p>
 
 
 <h3 class="typedecl"><a name="type-session">session()</a></h3>
@@ -269,7 +289,7 @@ required.</p>
 
 <h3 class="function"><a name="read_fru-2">read_fru/2</a></h3>
 <div class="spec">
-<p><tt>read_fru(Session::<a href="#type-session">session()</a>, FruId::0..254) -&gt; {ok, <a href="eipmi_fru.html#type-info">eipmi_fru:info()</a>} | {error, term()}</tt><br></p>
+<p><tt>read_fru(Session::<a href="#type-session">session()</a>, FruId::0..254) -&gt; {ok, <a href="#type-fru_info">fru_info()</a>} | {error, term()}</tt><br></p>
 </div><p>
   Return the FRU inventory data for a specific FRU id. The returned FRU
   information is a property list that does only contain the available and
@@ -278,7 +298,7 @@ required.</p>
 
 <h3 class="function"><a name="read_fru_inventory-2">read_fru_inventory/2</a></h3>
 <div class="spec">
-<p><tt>read_fru_inventory(Session::<a href="#type-session">session()</a>, SdrRepository::[<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>]) -&gt; {ok, [<a href="eipmi_fru.html#type-info">eipmi_fru:info()</a>]} | {error, [term()]}</tt><br></p>
+<p><tt>read_fru_inventory(Session::<a href="#type-session">session()</a>, SdrRepository::[<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>]) -&gt; {ok, <a href="#type-fru_inventory">fru_inventory()</a>} | {error, [term()]}</tt><br></p>
 </div><p>
   Return the FRU inventory data for all FRU represented by a FRU Device Locator
   Record in the Sensor Data Record (SDR) Repository.</p>
@@ -286,7 +306,7 @@ required.</p>
 
 <h3 class="function"><a name="read_sdr-2">read_sdr/2</a></h3>
 <div class="spec">
-<p><tt>read_sdr(Session::<a href="#type-session">session()</a>, RecordId::non_neg_integer()) -&gt; {ok, <a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>} | {error, term()}</tt><br></p>
+<p><tt>read_sdr(Session::<a href="#type-session">session()</a>, RecordId::non_neg_integer()) -&gt; {ok, <a href="#type-sdr">sdr()</a>} | {error, term()}</tt><br></p>
 </div><p><p>  
 Return a specific record from the Sensor Data Record (SDR) Repository.</p>
  
@@ -297,7 +317,7 @@ Return a specific record from the Sensor Data Record (SDR) Repository.</p>
 
 <h3 class="function"><a name="read_sdr_repository-1">read_sdr_repository/1</a></h3>
 <div class="spec">
-<p><tt>read_sdr_repository(Session::<a href="#type-session">session()</a>) -&gt; {ok, [<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>]} | {error, term()}</tt><br></p>
+<p><tt>read_sdr_repository(Session::<a href="#type-session">session()</a>) -&gt; {ok, <a href="#type-sdr_repository">sdr_repository()</a>} | {error, term()}</tt><br></p>
 </div><p><p>  
 Return all records contained in the Sensor Data Record (SDR) Repository.</p>
  
@@ -308,7 +328,7 @@ Return all records contained in the Sensor Data Record (SDR) Repository.</p>
 
 <h3 class="function"><a name="read_sel-2">read_sel/2</a></h3>
 <div class="spec">
-<p><tt>read_sel(Session::<a href="#type-session">session()</a>, Clear::boolean()) -&gt; {ok, [<a href="eipmi_sel.html#type-entry">eipmi_sel:entry()</a>]} | {error, term()}</tt><br></p>
+<p><tt>read_sel(Session::<a href="#type-session">session()</a>, Clear::boolean()) -&gt; {ok, [<a href="#type-sel_entry">sel_entry()</a>]} | {error, term()}</tt><br></p>
 </div><p><p>  
 Return all currently available entries from the System Event Log (SEL). The  
 returned SEL entries are property lists that do only contain the available  
@@ -321,35 +341,35 @@ argument the SEL can optionally be cleared after reading.</p>
 
 <h3 class="function"><a name="sdr_to_fru-2">sdr_to_fru/2</a></h3>
 <div class="spec">
-<p><tt>sdr_to_fru(X1::<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>, SdrRepository::[<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>]) -&gt; {ok, <a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>} | {error, term()}</tt><br></p>
+<p><tt>sdr_to_fru(X1::<a href="#type-sdr">sdr()</a>, SdrRepository::<a href="#type-sdr_repository">sdr_repository()</a>) -&gt; {ok, <a href="#type-sdr">sdr()</a>} | {error, term()}</tt><br></p>
 </div><p>
   Returns the FRU Device Locator Record associated with a specific sensor from
   the Sensor Data Record (SDR) repository, if any.</p>
 
 <h3 class="function"><a name="sdr_to_fru-3">sdr_to_fru/3</a></h3>
 <div class="spec">
-<p><tt>sdr_to_fru(Sdr::<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>, SdrRepository::[<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>], FruInventory::[<a href="eipmi_fru.html#type-info">eipmi_fru:info()</a>]) -&gt; {ok, <a href="eipmi_fru.html#type-info">eipmi_fru:info()</a>} | {error, term()}</tt><br></p>
+<p><tt>sdr_to_fru(Sdr::<a href="#type-sdr">sdr()</a>, SdrRepository::<a href="#type-sdr_repository">sdr_repository()</a>, FruInventory::<a href="#type-fru_inventory">fru_inventory()</a>) -&gt; {ok, <a href="#type-fru_info">fru_info()</a>} | {error, term()}</tt><br></p>
 </div><p>
   Returns the FRU inventory data associated with a specific sensor from the
   Sensor Data Record (SDR) repository, if any.</p>
 
 <h3 class="function"><a name="sel_to_fru-2">sel_to_fru/2</a></h3>
 <div class="spec">
-<p><tt>sel_to_fru(SelEntry::<a href="eipmi_sel.html#type-entry">eipmi_sel:entry()</a>, SdrRepository::[<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>]) -&gt; {ok, <a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>} | {error, term()}</tt><br></p>
+<p><tt>sel_to_fru(SelEntry::<a href="#type-sel_entry">sel_entry()</a>, SdrRepository::<a href="#type-sdr_repository">sdr_repository()</a>) -&gt; {ok, <a href="#type-sdr">sdr()</a>} | {error, term()}</tt><br></p>
 </div><p>
   Returns the FRU Device Locator Record associated with an entry in the System
   Event Log (SEL), if any.</p>
 
 <h3 class="function"><a name="sel_to_fru-3">sel_to_fru/3</a></h3>
 <div class="spec">
-<p><tt>sel_to_fru(SelEntry::<a href="eipmi_sel.html#type-entry">eipmi_sel:entry()</a>, SdrRepository::[<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>], FruInventory::[<a href="eipmi_fru.html#type-info">eipmi_fru:info()</a>]) -&gt; {ok, <a href="eipmi_fru.html#type-info">eipmi_fru:info()</a>} | {error, term()}</tt><br></p>
+<p><tt>sel_to_fru(SelEntry::<a href="#type-sel_entry">sel_entry()</a>, SdrRepository::<a href="#type-sdr_repository">sdr_repository()</a>, FruInventory::<a href="#type-fru_inventory">fru_inventory()</a>) -&gt; {ok, <a href="#type-fru_info">fru_info()</a>} | {error, term()}</tt><br></p>
 </div><p>
   Returns the FRU inventory data associated with an entry in the System
   Event Log (SEL), if any.</p>
 
 <h3 class="function"><a name="sel_to_sdr-2">sel_to_sdr/2</a></h3>
 <div class="spec">
-<p><tt>sel_to_sdr(X1::<a href="eipmi_sel.html#type-entry">eipmi_sel:entry()</a>, SdrRepository::[<a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>]) -&gt; {ok, <a href="eipmi_sdr.html#type-entry">eipmi_sdr:entry()</a>} | {error, term()}</tt><br></p>
+<p><tt>sel_to_sdr(X1::<a href="#type-sel_entry">sel_entry()</a>, SdrRepository::<a href="#type-sdr_repository">sdr_repository()</a>) -&gt; {ok, <a href="#type-sdr">sdr()</a>} | {error, term()}</tt><br></p>
 </div><p>
   Returns the Sensor Data Record (SDR) from the SDR repository associated with
   an entry in the System Event Log (SEL), if any.</p>
@@ -455,6 +475,6 @@ argument the SEL can optionally be cleared after reading.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Nov 23 2012, 09:44:55.</i></p>
+<p><i>Generated by EDoc, Nov 23 2012, 13:39:45.</i></p>
 </body>
 </html>
