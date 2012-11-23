@@ -87,35 +87,59 @@ and be prepared to receive the following events on the <code>handle_event/2</cod
 callback:
 
 ```
-{ipmi, Session &#183; eipmi:session(), established}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ established}
 '''
 The session was successfully established and activated.
 ```
-{ipmi, Session &#183; eipmi:session(), {closed, Reason &#183; term()}}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ {closed, Reason &#183; term()}}
 '''
 The session was closed with the provided reason.
 ```
-{ipmi, Session &#183; eipmi:session(), {decode_error, Reason &#183; term()}}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ {decode_error, Reason &#183; term()}}
 '''
 A received packet could not be decoded.
 ```
-{ipmi, Session &#183; eipmi:session(), {timeout, RqSeqNr &#183; 0..63}}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ {timeout, RqSeqNr &#183; 0..63}}
 '''
 The corresponding request timed out.
 ```
-{ipmi, Session &#183; eipmi:session(), {unhandled, {call, Request &#183; term()}}}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ {unhandled, {call, Request &#183; term()}}}
 '''
 The session received an invalid <code>gen_server</code> call.
 ```
-{ipmi, Session &#183; eipmi:session(), {unhandled, {cast, Request &#183; term()}}}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ {unhandled, {cast, Request &#183; term()}}}
 '''
 The session received an invalid <code>gen_server</code> cast.
 ```
-{ipmi, Session &#183; eipmi:session(), {unhandled, {info, Info &#183; term()}}}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ {unhandled, {info, Info &#183; term()}}}
 '''
 The session received an invalid message.
 ```
-{ipmi, Session &#183; eipmi:session(), {unhandled, {ipmi, {ok | error, term()}}}}
+{ipmi,
+ Session &#183; eipmi:session(),
+ Address &#183; inet:ip_address() | inet:hostname(),
+ {unhandled, {ipmi, {ok | error, term()}}}}
 '''
 The session received an IPMI response but no handler was found for it.
 
