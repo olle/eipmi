@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Module eipmi_util</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module eipmi_util</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
+   A module providing common utility functions.
+
+
+<h2><a name="description">Description</a></h2>
+   A module providing common utility functions.
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#binary_to_string-1">binary_to_string/1</a></td><td>
+  Convert a binary into a string removing all contained zero bytes.</td></tr>
+<tr><td valign="top"><a href="#copy_val-3">copy_val/3</a></td><td>
+  Copies the value of a property from one proplist to another.</td></tr>
+<tr><td valign="top"><a href="#format-2">format/2</a></td><td>
+  A flattening wrapper for <a href="io_lib.html#format-2"><code>io_lib:format/2</code></a>.</td></tr>
+<tr><td valign="top"><a href="#from_base26-1">from_base26/1</a></td><td>
+  Decodes a string from a base 26 encoded integer where <code>0</code> corresponds to
+  <code>A</code> and <code>25</code> corresponds to <code>Z</code>.</td></tr>
+<tr><td valign="top"><a href="#from_bcd_plus-1">from_bcd_plus/1</a></td><td>
+  Decodes a BCD plus encoded binary into a string.</td></tr>
+<tr><td valign="top"><a href="#from_packed_ascii-1">from_packed_ascii/1</a></td><td>
+  Decodes a packed 6bit ASCII encoded binary into a string.</td></tr>
+<tr><td valign="top"><a href="#get_bool-1">get_bool/1</a></td><td>
+  Return <code>false</code> if given value is <code>0</code>, <code>true</code> otherwise.</td></tr>
+<tr><td valign="top"><a href="#get_bool_inv-1">get_bool_inv/1</a></td><td>
+  Return <code>true</code> if given value is <code>0</code>, <code>false</code> otherwise.</td></tr>
+<tr><td valign="top"><a href="#get_env-2">get_env/2</a></td><td>
+  Return the value of a configuration property from the eipmi application
+  environment.</td></tr>
+<tr><td valign="top"><a href="#get_val-2">get_val/2</a></td><td>
+  Return the value of a property from a proplist.</td></tr>
+<tr><td valign="top"><a href="#get_val-3">get_val/3</a></td><td>
+  Return the value of a property from a proplist.</td></tr>
+<tr><td valign="top"><a href="#merge_vals-2">merge_vals/2</a></td><td>
+  Merges two proplists.</td></tr>
+<tr><td valign="top"><a href="#normalize-2">normalize/2</a></td><td>
+  Normalizes a string or a binary to a binary with the specified length
+  (in bytes).</td></tr>
+<tr><td valign="top"><a href="#update_val-3">update_val/3</a></td><td>
+  Update the value of a property in a proplist.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="binary_to_string-1">binary_to_string/1</a></h3>
+<div class="spec">
+<p><tt>binary_to_string(Binary::binary()) -&gt; string()</tt><br></p>
+</div><p>
+  Convert a binary into a string removing all contained zero bytes.</p>
+
+<h3 class="function"><a name="copy_val-3">copy_val/3</a></h3>
+<div class="spec">
+<p><tt>copy_val(Property::atom(), DestPropList::<a href="proplists.html#type-proplist">proplists:proplist()</a>, SrcPropList::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; <a href="proplists.html#type-proplist">proplists:proplist()</a></tt><br></p>
+</div><p>
+  Copies the value of a property from one proplist to another. If the property
+  is not found in the original proplist the original destination proplist is
+  returned. This will remove all previous values associated with the property.</p>
+
+<h3 class="function"><a name="format-2">format/2</a></h3>
+<div class="spec">
+<p><tt>format(Format::string(), Args::[term()]) -&gt; string()</tt><br></p>
+</div><p>
+  A flattening wrapper for <a href="io_lib.html#format-2"><code>io_lib:format/2</code></a>.</p>
+
+<h3 class="function"><a name="from_base26-1">from_base26/1</a></h3>
+<div class="spec">
+<p><tt>from_base26(Number::non_neg_integer()) -&gt; string()</tt><br></p>
+</div><p>
+  Decodes a string from a base 26 encoded integer where <code>0</code> corresponds to
+  <code>A</code> and <code>25</code> corresponds to <code>Z</code>.</p>
+
+<h3 class="function"><a name="from_bcd_plus-1">from_bcd_plus/1</a></h3>
+<div class="spec">
+<p><tt>from_bcd_plus(Bitstring::bitstring()) -&gt; string()</tt><br></p>
+</div><p>
+  Decodes a BCD plus encoded binary into a string.</p>
+
+<h3 class="function"><a name="from_packed_ascii-1">from_packed_ascii/1</a></h3>
+<div class="spec">
+<p><tt>from_packed_ascii(Binary::binary()) -&gt; string()</tt><br></p>
+</div><p>
+  Decodes a packed 6bit ASCII encoded binary into a string.</p>
+
+<h3 class="function"><a name="get_bool-1">get_bool/1</a></h3>
+<div class="spec">
+<p><tt>get_bool(X1) -&gt; any()</tt></p>
+</div><p>
+  Return <code>false</code> if given value is <code>0</code>, <code>true</code> otherwise.</p>
+
+<h3 class="function"><a name="get_bool_inv-1">get_bool_inv/1</a></h3>
+<div class="spec">
+<p><tt>get_bool_inv(X1) -&gt; any()</tt></p>
+</div><p>
+  Return <code>true</code> if given value is <code>0</code>, <code>false</code> otherwise.</p>
+
+<h3 class="function"><a name="get_env-2">get_env/2</a></h3>
+<div class="spec">
+<p><tt>get_env(Property::atom(), Default::term()) -&gt; term()</tt><br></p>
+</div><p>
+  Return the value of a configuration property from the eipmi application
+  environment.</p>
+
+<h3 class="function"><a name="get_val-2">get_val/2</a></h3>
+<div class="spec">
+<p><tt>get_val(Property::atom(), PropList::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; term()</tt><br></p>
+</div><p>
+  Return the value of a property from a proplist.</p>
+<p><b>See also:</b> <a href="proplists.html#get_value-2">proplists:get_value/2</a>.</p>
+
+<h3 class="function"><a name="get_val-3">get_val/3</a></h3>
+<div class="spec">
+<p><tt>get_val(Property::atom(), PropList::<a href="proplists.html#type-proplist">proplists:proplist()</a>, Default::term()) -&gt; term()</tt><br></p>
+</div><p>
+  Return the value of a property from a proplist.</p>
+<p><b>See also:</b> <a href="proplists.html#get_value-3">proplists:get_value/3</a>.</p>
+
+<h3 class="function"><a name="merge_vals-2">merge_vals/2</a></h3>
+<div class="spec">
+<p><tt>merge_vals(PropList1::<a href="proplists.html#type-proplist">proplists:proplist()</a>, PropList2::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; <a href="proplists.html#type-proplist">proplists:proplist()</a></tt><br></p>
+</div><p>
+  Merges two proplists. The resulting proplist will preserve all key/values from
+  proplist one. Additionally values for missing keys will be added from the
+  second proplist.</p>
+
+<h3 class="function"><a name="normalize-2">normalize/2</a></h3>
+<div class="spec">
+<p><tt>normalize(Length::non_neg_integer(), String::string() | binary()) -&gt; binary()</tt><br></p>
+</div><p>
+  Normalizes a string or a binary to a binary with the specified length
+  (in bytes).</p>
+
+<h3 class="function"><a name="update_val-3">update_val/3</a></h3>
+<div class="spec">
+<p><tt>update_val(Property::atom(), Value::term(), PropList::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; <a href="proplists.html#type-proplist">proplists:proplist()</a></tt><br></p>
+</div><p>
+  Update the value of a property in a proplist. This will remove all previous
+  values associated with the property.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Nov 26 2012, 17:23:57.</i></p>
+</body>
+</html>

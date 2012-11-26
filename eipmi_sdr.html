@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Module eipmi_sdr</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module eipmi_sdr</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
+   A module providing reading and decoding functionality for Sensor Data
+   Records (SDRs).
+
+
+<h2><a name="description">Description</a></h2>
+   A module providing reading and decoding functionality for Sensor Data
+   Records (SDRs).
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-entry">entry()</a></h3>
+<p><tt>entry() = {<a href="#type-record_type">record_type()</a>, [<a href="#type-property">property()</a>]} | {sdr_info, [{version, string()} | {entries, non_neg_integer()} | {free_space, non_neg_integer()} | {most_recent_addition, non_neg_integer()} | {most_recent_erase, non_neg_integer()} | {overflow, boolean()} | {operations, [delete | partial_add | reserve | get_allocation_info]}]}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-property">property()</a></h3>
+<p><tt>property() = <a href="eipmi_sensor.html#type-addr">eipmi_sensor:addr()</a> | {record_id, non_neg_integer()} | {sdr_version, string()} | {record_type, <a href="#type-record_type">record_type()</a>} | {record_length, non_neg_integer()} | {nominal_reading, non_neg_integer()} | {nominal_maximum, non_neg_integer()} | {nominal_minimum, non_neg_integer()} | {maximum_reading, non_neg_integer()} | {minimum_reading, non_neg_integer()} | {container, [<a href="eipmi_sensor.html#type-entity">eipmi_sensor:entity()</a>]} | {containee, [<a href="eipmi_sensor.html#type-entity">eipmi_sensor:entity()</a> | <a href="eipmi_sensor.html#type-addr">eipmi_sensor:addr()</a>]} | {linked_records_exist, boolean()} | {presence_sensor_always_accessible, boolean()} | {access_addr, non_neg_integer()} | {device_type, non_neg_integer()} | {device_type_modifier, non_neg_integer()} | {id, string()} | {device_support, [atom()]} | {firmware_version, string()} | {ipmi_version, string()} | {manufacturer_id, non_neg_integer()} | {product_id, non_neg_integer()} | {guid, string()} | {msg_channel_info, [{transmit_support, boolean()} | {sensor_lun, non_neg_integer()} | {protocol, ipmb | {icmb, number()} | {sm_bus, number()} | system_format | {oem, number()}}]} | {messaging_interrupt, {irq, non_neg_integer()} | {pci, string()} | smi | sci | {interrupt, non_neg_integer()} | assigned} | {event_message_buffer_interrupt, {irq, non_neg_integer()} | {pci, string()} | smi | sci | {interrupt, non_neg_integer()} | assigned} | {data, binary()} | {percentage, boolean()} | {sensor_format, unsigned | ones_complement | twos_complement} | {sensor_rate, <a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a> | {<a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>, <a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>} | {<a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>, per, <a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>}} | {sensor_unit, <a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>} | {sensor_tolerance, {number(), <a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>}} | {sensor_resolution, {number(), <a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>}} | {sensor_accuracy, {number(), percent}} | {sensor_coefficients, {linear | ln | log10 | log2 | e | exp10 | exp2 | '1/x' | sqr | cube | sqrt | 'cube-1' | non_linear | oem_non_linear, integer(), integer(), integer(), integer()}} | {sensor_number, non_neg_integer()} | {sensor_numbers, [non_neg_integer()]} | {sensor_direction, input | output}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-record_type">record_type()</a></h3>
+<p><tt>record_type() = full | compact | event_only | entity_association | device_relative_entity_association | generic_device_locator | fru_device_locator | management_controller_device_locator | management_controller_confirmation | bmc_message_channel_info | oem | reserved</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#convert-2">convert/2</a></td><td>
+  Convert a raw sensor reading into a meaningful value, using the sensors
+  full SDR record.</td></tr>
+<tr><td valign="top"><a href="#maybe_read-2">maybe_read/2</a></td><td>
+  Read all entries from the sensor data record repository (SDR) *only* when
+  the SDR repository changed since the last read.</td></tr>
+<tr><td valign="top"><a href="#read-1">read/1</a></td><td>
+  Read all entries from the sensor data record repository (SDR).</td></tr>
+<tr><td valign="top"><a href="#read-2">read/2</a></td><td>
+  Read one specific entry from the sensor data record repository (SDR).</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="convert-2">convert/2</a></h3>
+<div class="spec">
+<p><tt>convert(Raw::binary(), X2::{full, [<a href="#type-property">property()</a>]}) -&gt; {ok, {number(), <a href="eipmi_sensor.html#type-unit">eipmi_sensor:unit()</a>}} | {error, term()}</tt><br></p>
+</div><p>
+  Convert a raw sensor reading into a meaningful value, using the sensors
+  full SDR record.</p>
+
+<h3 class="function"><a name="maybe_read-2">maybe_read/2</a></h3>
+<div class="spec">
+<p><tt>maybe_read(SessionPid, OldSdrRepository) -&gt; any()</tt></p>
+</div><p>
+  Read all entries from the sensor data record repository (SDR) *only* when
+  the SDR repository changed since the last read.</p>
+
+<h3 class="function"><a name="read-1">read/1</a></h3>
+<div class="spec">
+<p><tt>read(SessionPid::pid()) -&gt; [<a href="#type-entry">entry()</a>]</tt><br></p>
+</div><p>
+  Read all entries from the sensor data record repository (SDR).</p>
+
+<h3 class="function"><a name="read-2">read/2</a></h3>
+<div class="spec">
+<p><tt>read(SessionPid::pid(), RecordId::non_neg_integer()) -&gt; <a href="#type-entry">entry()</a></tt><br></p>
+</div><p>
+  Read one specific entry from the sensor data record repository (SDR).</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Nov 26 2012, 17:23:57.</i></p>
+</body>
+</html>
