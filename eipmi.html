@@ -37,11 +37,11 @@ callback as well as the top level supervisor.</p>
 
 
 <h3 class="typedecl"><a name="type-option">option()</a></h3>
-<p><tt>option() = {initial_outbound_seq_nr, non_neg_integer()} | {password, string()} | {port, <a href="inet.html#type-port_number">inet:port_number()</a>} | {privilege, callback | user | operator | administrator} | {rq_addr, 129..141} | {timeout, non_neg_integer()} | {user, string()}</tt></p>
+<p><tt>option() = {clear_sel, boolean()} | {initial_outbound_seq_nr, non_neg_integer()} | {keep_alive_retransmits, non_neg_integer()} | {password, string()} | {poll_sel, integer()} | {port, <a href="inet.html#type-port_number">inet:port_number()</a>} | {privilege, callback | user | operator | administrator} | {rq_addr, 129..141} | {timeout, non_neg_integer()} | {user, string()}</tt></p>
 
 
 <h3 class="typedecl"><a name="type-option_name">option_name()</a></h3>
-<p><tt>option_name() = initial_outbound_seq_nr | password | port | privilege | rq_addr | timeout | user</tt></p>
+<p><tt>option_name() = clear_sel | initial_outbound_seq_nr | keep_alive_retransmits | password | poll_sel | port | privilege | rq_addr | timeout | user</tt></p>
 
 
 <h3 class="typedecl"><a name="type-req_net_fn">req_net_fn()</a></h3>
@@ -90,52 +90,77 @@ callback as well as the top level supervisor.</p>
   Same as <a href="#open-1"><code>open/1</code></a> but allows the specification of the following custom
   options:
   <dl>
+    <dt><code>{clear_sel, boolean()}</code></dt>
+    <dd>
+      <p>
+      Indicates whether the System Event Log is to be cleared after read when
+      SEL polling is enabled using <code>poll_sel</code>, default is <code>true</code>.
+      </p>
+   </dd>
     <dt><code>{initial_outbound_seq_nr, non_neg_integer()}</code></dt>
     <dd>
       <p>
-      the initial outbound sequence number that will be requested on the BMC,
-      default is <code>16#1337</code>
+      The initial outbound sequence number that will be requested on the BMC,
+      default is <code>16#1337</code>.
+      </p>
+   </dd>
+    <dt><code>{keep_alive_retransmits, non_neg_integer()}</code></dt>
+    <dd>
+      <p>
+      The number of retransmits allowed for session keep_alive requests,
+      default is <code>2</code>.
       </p>
    </dd>
     <dt><code>{password, string() with length &lt;= 16bytes}</code></dt>
     <dd>
       <p>
-      a password string used for authentication when anonymous login is not
-      available, default is <code>""</code>
+      A password string used for authentication when anonymous login is not
+      available, default is <code>""</code>.
+      </p>
+    </dd>
+    <dt><code>{poll_sel, integer()}</code></dt>
+    <dd>
+      <p>
+      Enables/disable automatic polling of the System Event Log (SEL). When
+      polling is enabled the SEL will periodically be read and all events will
+      be forwarded to the subscribed event handlers registered with
+      <a href="#subscribe-2"><code>subscribe/2</code></a>. The provided integer will be used as timeout value
+      in milliseconds. A zero or negative value will disable automatic SEL
+      polling, default is <code>0</code> (disabled).
       </p>
     </dd>
     <dt><code>{port, inet:port_number()}</code></dt>
     <dd>
       <p>
-      the RMCP port the far end is expecting incoming RMCP and IPMI packets,
-      default is <code>623</code>
+      The RMCP port the far end is expecting incoming RMCP and IPMI packets,
+      default is <code>623</code>.
       </p>
     </dd>
     <dt><code>{privilege, callback | user | operator | administrator}</code></dt>
     <dd>
       <p>
-      the requested privilege level for this session, default is
-      <code>administrator</code>
+      The requested privilege level for this session, default is
+      <code>administrator</code>.
       </p>
     </dd>
     <dt><code>{rq_addr, 16#81..16#8d}</code></dt>
     <dd>
       <p>
-      the requestor address used in IPMI lan packages, the default value of
-      <code>16#81</code> should be suitable for all common cases
+      The requestor address used in IPMI lan packages, the default value of
+      <code>16#81</code> should be suitable for all common cases.
       </p>
     </dd>
     <dt><code>{timeout, non_neg_integer()}</code></dt>
     <dd>
       <p>
-      the timeout for IPMI requests, default is <code>1000ms</code>
+      The timeout for IPMI requests, default is <code>1000ms</code>.
       </p>
     </dd>
     <dt><code>{user, string() with length &lt;= 16bytes}</code></dt>
     <dd>
       <p>
-      a user name string used for authentication when neither anonymous nor
-      null user login are available, default is <code>""</code>
+      A user name string used for authentication when neither anonymous nor
+      null user login are available, default is <code>""</code>.
       </p>
     </dd>
   </dl></td></tr>
@@ -217,52 +242,77 @@ required.</p>
   Same as <a href="#open-1"><code>open/1</code></a> but allows the specification of the following custom
   options:
   <dl>
+    <dt><code>{clear_sel, boolean()}</code></dt>
+    <dd>
+      <p>
+      Indicates whether the System Event Log is to be cleared after read when
+      SEL polling is enabled using <code>poll_sel</code>, default is <code>true</code>.
+      </p>
+   </dd>
     <dt><code>{initial_outbound_seq_nr, non_neg_integer()}</code></dt>
     <dd>
       <p>
-      the initial outbound sequence number that will be requested on the BMC,
-      default is <code>16#1337</code>
+      The initial outbound sequence number that will be requested on the BMC,
+      default is <code>16#1337</code>.
+      </p>
+   </dd>
+    <dt><code>{keep_alive_retransmits, non_neg_integer()}</code></dt>
+    <dd>
+      <p>
+      The number of retransmits allowed for session keep_alive requests,
+      default is <code>2</code>.
       </p>
    </dd>
     <dt><code>{password, string() with length &lt;= 16bytes}</code></dt>
     <dd>
       <p>
-      a password string used for authentication when anonymous login is not
-      available, default is <code>""</code>
+      A password string used for authentication when anonymous login is not
+      available, default is <code>""</code>.
+      </p>
+    </dd>
+    <dt><code>{poll_sel, integer()}</code></dt>
+    <dd>
+      <p>
+      Enables/disable automatic polling of the System Event Log (SEL). When
+      polling is enabled the SEL will periodically be read and all events will
+      be forwarded to the subscribed event handlers registered with
+      <a href="#subscribe-2"><code>subscribe/2</code></a>. The provided integer will be used as timeout value
+      in milliseconds. A zero or negative value will disable automatic SEL
+      polling, default is <code>0</code> (disabled).
       </p>
     </dd>
     <dt><code>{port, inet:port_number()}</code></dt>
     <dd>
       <p>
-      the RMCP port the far end is expecting incoming RMCP and IPMI packets,
-      default is <code>623</code>
+      The RMCP port the far end is expecting incoming RMCP and IPMI packets,
+      default is <code>623</code>.
       </p>
     </dd>
     <dt><code>{privilege, callback | user | operator | administrator}</code></dt>
     <dd>
       <p>
-      the requested privilege level for this session, default is
-      <code>administrator</code>
+      The requested privilege level for this session, default is
+      <code>administrator</code>.
       </p>
     </dd>
     <dt><code>{rq_addr, 16#81..16#8d}</code></dt>
     <dd>
       <p>
-      the requestor address used in IPMI lan packages, the default value of
-      <code>16#81</code> should be suitable for all common cases
+      The requestor address used in IPMI lan packages, the default value of
+      <code>16#81</code> should be suitable for all common cases.
       </p>
     </dd>
     <dt><code>{timeout, non_neg_integer()}</code></dt>
     <dd>
       <p>
-      the timeout for IPMI requests, default is <code>1000ms</code>
+      The timeout for IPMI requests, default is <code>1000ms</code>.
       </p>
     </dd>
     <dt><code>{user, string() with length &lt;= 16bytes}</code></dt>
     <dd>
       <p>
-      a user name string used for authentication when neither anonymous nor
-      null user login are available, default is <code>""</code>
+      A user name string used for authentication when neither anonymous nor
+      null user login are available, default is <code>""</code>.
       </p>
     </dd>
   </dl></p>
@@ -483,6 +533,17 @@ argument the SEL can optionally be cleared after reading.</p>
     <dd>
       <p>the session received an IPMI response but no handler was found for it</p>
     </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        SELEntry :: sel_entry()}</code>
+    </dt>
+    <dd>
+      <p>
+        a SEL event forwarded through the automatic SEL polling mechanism
+      </p>
+    </dd>
   </dl></p>
 
 <h3 class="function"><a name="unsubscribe-2">unsubscribe/2</a></h3>
@@ -495,6 +556,6 @@ argument the SEL can optionally be cleared after reading.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Nov 23 2012, 16:45:49.</i></p>
+<p><i>Generated by EDoc, Nov 26 2012, 17:03:22.</i></p>
 </body>
 </html>

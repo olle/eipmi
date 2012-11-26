@@ -22,10 +22,10 @@
    can close the session using <a href="#stop-1"><code>stop/1</code></a>.</p>
   
    <p>Synchronous requests can be issued over this session at any given time using
-   <a href="#rpc-3"><code>rpc/3</code></a>. When the session is not yet established requests will be
-   queued and issued as soon as the far end (BMC) is ready. Request timeouts
-   can be configured on state machine startup using the <code>timeout</code> property
-   of the <code>Options</code> field.</p>
+   <a href="#rpc-3"><code>rpc/3</code></a> or <a href="#rpc-4"><code>rpc/4</code></a>. When the session is not yet established
+   requests will be queued and issued as soon as the far end (BMC) is ready.
+   Request timeouts can be configured on state machine startup using the
+   <code>timeout</code> property of the <code>Options</code> field.</p>
   
    <p>A session may be shared between mutliple processes. While the requests of   
 one process will be synchronous and thus ordered, requests from different   
@@ -35,9 +35,11 @@ Since the session does not (yet) provide any kind of flow control it is the
 responsibility of the rpc-ing processes to care for the total number of   
 concurrent RPCs or to live with error/timeout returns.</p>
   
-   The server will handle the low level RMCP and IPMI protocol regarding
-   encoding and decoding of messages, as well as correct packet
-   acknowledgement, sequence number handling and session opening/closing.
+   <p>The server will handle the low level RMCP and IPMI protocol regarding   
+encoding and decoding of messages, as well as correct packet   
+acknowledgement, sequence number handling and session opening/closing.   
+Packet loss is not handled during session setup.</p>
+  
    A session will use the modules <a href="eipmi_request.html"><code>eipmi_request</code></a> and
    <a href="eipmi_response.html"><code>eipmi_response</code></a> to encode and decode requests/responses. Therefore,
    there's no need to edit the session but extending these modules when
@@ -55,11 +57,12 @@ concurrent RPCs or to live with error/timeout returns.</p>
 
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#rpc-3">rpc/3</a></td><td>
+  Basically the same as <a href="#rpc-4"><code>rpc/4</code></a>, but the number of allowed retransmits
+  is taken from the <code>eipmi</code> application configuration.</td></tr>
+<tr><td valign="top"><a href="#rpc-4">rpc/4</a></td><td>
   Send a synchronous IPMI RPC over this session.</td></tr>
 <tr><td valign="top"><a href="#start_link-3">start_link/3</a></td><td>
   Starts a session server which in turn will occupy a free UDP socket.</td></tr>
-<tr><td valign="top"><a href="#stop-1">stop/1</a></td><td>
-  Stop the server, close the session.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
@@ -68,8 +71,19 @@ concurrent RPCs or to live with error/timeout returns.</p>
 <div class="spec">
 <p><tt>rpc(Pid::pid(), Request::<a href="eipmi.html#type-request">eipmi:request()</a>, Properties::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; {ok, <a href="proplists.html#type-proplist">proplists:proplist()</a>} | {error, term()}</tt><br></p>
 </div><p>
+  Basically the same as <a href="#rpc-4"><code>rpc/4</code></a>, but the number of allowed retransmits
+  is taken from the <code>eipmi</code> application configuration. If not configured the
+  default number of allowed retransmits is <code>2</code>.</p>
+<p><b>See also:</b> <a href="#rpc-4">rpc/4</a>.</p>
+
+<h3 class="function"><a name="rpc-4">rpc/4</a></h3>
+<div class="spec">
+<p><tt>rpc(Pid::pid(), Request::<a href="eipmi.html#type-request">eipmi:request()</a>, Properties::<a href="proplists.html#type-proplist">proplists:proplist()</a>, Retransmits::non_neg_integer()) -&gt; {ok, <a href="proplists.html#type-proplist">proplists:proplist()</a>} | {error, term()}</tt><br></p>
+</div><p>
   Send a synchronous IPMI RPC over this session. If the session is not yet
-  established the request will be queued.</p>
+  established the request will be queued. The last arguments specifies the
+  number of allowed retransmits. Since requests get sent over UDP packet
+  delivery may be unreliable and requests could get lost.</p>
 
 <h3 class="function"><a name="start_link-3">start_link/3</a></h3>
 <div class="spec">
@@ -81,15 +95,9 @@ concurrent RPCs or to live with error/timeout returns.</p>
   startup. This will also setup a session by sending the necessary IPMI
   protocol messages. All requests received before the session is activated will
   be queued and sent as soon as the session is established.</p>
-
-<h3 class="function"><a name="stop-1">stop/1</a></h3>
-<div class="spec">
-<p><tt>stop(Pid::pid()) -&gt; ok</tt><br></p>
-</div><p>
-  Stop the server, close the session.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Nov 23 2012, 16:45:49.</i></p>
+<p><i>Generated by EDoc, Nov 26 2012, 17:03:22.</i></p>
 </body>
 </html>
