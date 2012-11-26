@@ -18,7 +18,6 @@ with other Erlang/OTP concepts and solutions.
 <li> RMCP presence ping/pong</li>
 <li> Session initiation and activation</li>
 <li> Some basic IPMI queries</li>
-<li> Support for LAN alerts (events)</li>
 
 We really want to provide a simple enough basic implementation, that is open
 for extension, and not going for a complete coverage of the specification right
@@ -48,7 +47,8 @@ add a corresponding frontend API function to the <code>eipmi</code> module.
 The following sections will give a brief description of the EIPMI features as
 well as some usage examples for developers integrating the application into
 their project. Additional information can be found in the projects EDoc
-documentation located <a href="http://lindenbaum.github.com/eipmi/">here</a>.
+documentation located <a href="http://lindenbaum.github.com/eipmi/">here</a>. The EIPMI
+API functions are exported by the <code>eipmi</code> module.
 
 === Sessions &amp; Authentication ===
 
@@ -173,11 +173,23 @@ will open a session, read the FRU with id 253 and close the session again.
 
 ```
 {ok, Session} = eipmi:open("10.1.31.11"),
-{ok, FruInfo} = eipmi:read_fru(Session, 253),
+{ok, {fru_data, FruInfo}} = eipmi:read_fru(Session, 253),
 BoardArea = proplists:get_value(board_area, FruInfo),
 Name = proplists:get_value(name, BoardArea),
 Serial = proplists:get_value(serial_number, BoardArea),
 error_logger:info_msg("Board ~s has serial number ~s.~n", [Name, Serial]),
+eipmi:close(Session),
+'''
+
+The following snippet first reads the BMC's Sensor Data Record Repository and
+then returns the complete FRU inventory based on the found FRU Device Locator
+Records.
+
+```
+{ok, Session} = eipmi:open("10.1.31.11"),
+{ok, SDRRepository} = eipmi:read_sdr_repository(Session),
+{ok, FruInventory} = eipmi:read_fru_inventory(Session, SDRRepository),
+error_logger:info_msg("FRU inventory:~n~p~n", [FruInventory]),
 eipmi:close(Session),
 '''
 
