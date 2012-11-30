@@ -535,6 +535,79 @@ Returns:
 ```
 [{data, binary()}]
 '''
+
+==== Get PICMG Properties ====
+Argument:
+```
+[]
+'''
+
+Returns:
+```
+[{picmg_extension, string()},
+ {max_fru_id, 0..254},
+ {ipmc_fru_id, 0..254}]
+'''
+
+==== Set FRU Activation Policy ====
+Argument:
+```
+[{fru_id, 0..254},
+ {deactivation_locked, boolean()}, (optional)
+ {locked, boolean()} (optional)]
+'''
+
+Returns:
+```
+[]
+'''
+
+==== Get FRU Activation Policy ====
+Argument:
+```
+[{fru_id, 0..254}]
+'''
+
+Returns:
+```
+[{deactivation_locked, boolean()},
+ {locked, boolean()}]
+'''
+
+==== Set FRU Activation ====
+Argument:
+```
+[{fru_id, 0..254},
+ {activate, boolean()}]
+'''
+
+Returns:
+```
+[]
+'''
+
+==== FRU Control ====
+Argument:
+```
+[{fru_id, 0..254},
+ {control, cold_reset | warm_reset | graceful_reboot | diagnostic_interrupt | quiesce}]
+'''
+
+Returns:
+```
+[]
+'''
+
+==== Get Device Locator Record ID ====
+Argument:
+```
+[{fru_id, 0..254}]
+'''
+
+Returns:
+```
+[{record_id, non_neg_integer()}]
+'''
 <script>
 // Jump directly to a referenced url given in trailing '[]:...'-notation
 function goto(tag) { parent.document.location.href = url(tag); }
