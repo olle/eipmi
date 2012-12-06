@@ -84,6 +84,14 @@ callback as well as the top level supervisor.</p>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#close-1">close/1</a></td><td>
   Closes an IPMI session previously opened with <a href="#open-1"><code>open/1</code></a> or
   <a href="#open-2"><code>open/2</code></a>.</td></tr>
+<tr><td valign="top"><a href="#get_sdr-2">get_sdr/2</a></td><td>  
+Return a specific record from the Sensor Data Record (SDR) Repository.</td></tr>
+<tr><td valign="top"><a href="#get_sdr_repository-1">get_sdr_repository/1</a></td><td>  
+Return all records contained in the Sensor Data Record (SDR) Repository.</td></tr>
+<tr><td valign="top"><a href="#get_sdr_repository-2">get_sdr_repository/2</a></td><td>
+  Basically the same as <a href="#read_sdr_repository-1"><code>read_sdr_repository/1</code></a> but the SDR will only be  
+read when there were changes compared to the given SDR repository (regarding)  
+modification timestamps.</td></tr>
 <tr><td valign="top"><a href="#open-1">open/1</a></td><td>
   Opens an IPMI session to a given host.</td></tr>
 <tr><td valign="top"><a href="#open-2">open/2</a></td><td>
@@ -176,14 +184,6 @@ callback as well as the top level supervisor.</p>
 <tr><td valign="top"><a href="#read_fru_inventory-2">read_fru_inventory/2</a></td><td>
   Return the FRU inventory data for all FRU represented by a FRU Device Locator
   Record in the Sensor Data Record (SDR) Repository.</td></tr>
-<tr><td valign="top"><a href="#read_sdr-2">read_sdr/2</a></td><td>  
-Return a specific record from the Sensor Data Record (SDR) Repository.</td></tr>
-<tr><td valign="top"><a href="#read_sdr_repository-1">read_sdr_repository/1</a></td><td>  
-Return all records contained in the Sensor Data Record (SDR) Repository.</td></tr>
-<tr><td valign="top"><a href="#read_sdr_repository-2">read_sdr_repository/2</a></td><td>
-  Basically the same as <a href="#read_sdr_repository-1"><code>read_sdr_repository/1</code></a> but the SDR will only be  
-read when there were changes compared to the given SDR repository (regarding)  
-modification timestamps.</td></tr>
 <tr><td valign="top"><a href="#read_sel-2">read_sel/2</a></td><td>  
 Return all currently available entries from the System Event Log (SEL).</td></tr>
 <tr><td valign="top"><a href="#sdr_to_fru-2">sdr_to_fru/2</a></td><td>
@@ -220,6 +220,44 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
   Closes an IPMI session previously opened with <a href="#open-1"><code>open/1</code></a> or
   <a href="#open-2"><code>open/2</code></a>. This will return <code>{error, no_session}</code> when the given
   session is not active any more.</p>
+
+<h3 class="function"><a name="get_sdr-2">get_sdr/2</a></h3>
+<div class="spec">
+<p><tt>get_sdr(Session::<a href="#type-session">session()</a>, RecordId::non_neg_integer()) -&gt; {ok, <a href="#type-sdr">sdr()</a>} | {error, term()}</tt><br></p>
+</div><p><p>  
+Return a specific record from the Sensor Data Record (SDR) Repository.</p>
+ 
+  Reading of the SDR may fail (e.g. return <code>{error, term()}</code>) when the
+  reservation for SDR reading with non-zero offsets gets cancelled. This is not
+  a severe error. It is most likely that the SDR can be read successfully when
+  retried.</p>
+
+<h3 class="function"><a name="get_sdr_repository-1">get_sdr_repository/1</a></h3>
+<div class="spec">
+<p><tt>get_sdr_repository(Session::<a href="#type-session">session()</a>) -&gt; {ok, <a href="#type-sdr_repository">sdr_repository()</a>} | {error, term()}</tt><br></p>
+</div><p><p>  
+Return all records contained in the Sensor Data Record (SDR) Repository.  
+Please note that reading the complete SDR repository may take a significant  
+amount of time since there may be lots of sensor available.</p>
+ 
+  Reading of the SDR may fail (e.g. return <code>{error, term()}</code>) when the
+  reservation for SDR reading with non-zero offsets gets cancelled. This is not
+  a severe error. It is most likely that the SDR can be read successfully when
+  retried.</p>
+
+<h3 class="function"><a name="get_sdr_repository-2">get_sdr_repository/2</a></h3>
+<div class="spec">
+<p><tt>get_sdr_repository(Session::<a href="#type-session">session()</a>, Previous::<a href="#type-sdr_repository">sdr_repository()</a>) -&gt; {ok, <a href="#type-sdr_repository">sdr_repository()</a>} | {error, term()}</tt><br></p>
+</div><p><p>
+  Basically the same as <a href="#read_sdr_repository-1"><code>read_sdr_repository/1</code></a> but the SDR will only be  
+read when there were changes compared to the given SDR repository (regarding)  
+modification timestamps. In case the SDR repository did not receive any  
+updates the given old SDR repository is returned.</p>
+ 
+  Reading of the SDR may fail (e.g. return <code>{error, term()}</code>) when the
+  reservation for SDR reading with non-zero offsets gets cancelled. This is not
+  a severe error. It is most likely that the SDR can be read successfully when
+  retried.</p>
 
 <h3 class="function"><a name="open-1">open/1</a></h3>
 <div class="spec">
@@ -357,44 +395,6 @@ required.</p>
   Return the FRU inventory data for all FRU represented by a FRU Device Locator
   Record in the Sensor Data Record (SDR) Repository.</p>
 <p><b>See also:</b> <a href="#read_fru-2">read_fru/2</a>.</p>
-
-<h3 class="function"><a name="read_sdr-2">read_sdr/2</a></h3>
-<div class="spec">
-<p><tt>read_sdr(Session::<a href="#type-session">session()</a>, RecordId::non_neg_integer()) -&gt; {ok, <a href="#type-sdr">sdr()</a>} | {error, term()}</tt><br></p>
-</div><p><p>  
-Return a specific record from the Sensor Data Record (SDR) Repository.</p>
- 
-  Reading of the SDR may fail (e.g. return <code>{error, term()}</code>) when the
-  reservation for SDR reading with non-zero offsets gets cancelled. This is not
-  a severe error. It is most likely that the SDR can be read successfully when
-  retried.</p>
-
-<h3 class="function"><a name="read_sdr_repository-1">read_sdr_repository/1</a></h3>
-<div class="spec">
-<p><tt>read_sdr_repository(Session::<a href="#type-session">session()</a>) -&gt; {ok, <a href="#type-sdr_repository">sdr_repository()</a>} | {error, term()}</tt><br></p>
-</div><p><p>  
-Return all records contained in the Sensor Data Record (SDR) Repository.  
-Please note that reading the complete SDR repository may take a significant  
-amount of time since there may be lots of sensor available.</p>
- 
-  Reading of the SDR may fail (e.g. return <code>{error, term()}</code>) when the
-  reservation for SDR reading with non-zero offsets gets cancelled. This is not
-  a severe error. It is most likely that the SDR can be read successfully when
-  retried.</p>
-
-<h3 class="function"><a name="read_sdr_repository-2">read_sdr_repository/2</a></h3>
-<div class="spec">
-<p><tt>read_sdr_repository(Session::<a href="#type-session">session()</a>, SdrRepository::<a href="#type-sdr_repository">sdr_repository()</a>) -&gt; {ok, <a href="#type-sdr_repository">sdr_repository()</a>} | {error, term()}</tt><br></p>
-</div><p><p>
-  Basically the same as <a href="#read_sdr_repository-1"><code>read_sdr_repository/1</code></a> but the SDR will only be  
-read when there were changes compared to the given SDR repository (regarding)  
-modification timestamps. In case the SDR repository did not receive any  
-updates the given old SDR repository is returned.</p>
- 
-  Reading of the SDR may fail (e.g. return <code>{error, term()}</code>) when the
-  reservation for SDR reading with non-zero offsets gets cancelled. This is not
-  a severe error. It is most likely that the SDR can be read successfully when
-  retried.</p>
 
 <h3 class="function"><a name="read_sel-2">read_sel/2</a></h3>
 <div class="spec">
@@ -556,6 +556,6 @@ argument the SEL can optionally be cleared after reading.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Dec 3 2012, 11:33:42.</i></p>
+<p><i>Generated by EDoc, Dec 6 2012, 13:15:26.</i></p>
 </body>
 </html>

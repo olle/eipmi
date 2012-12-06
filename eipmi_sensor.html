@@ -28,11 +28,11 @@
 
 
 <h3 class="typedecl"><a name="type-entity_id">entity_id()</a></h3>
-<p><tt>entity_id() = unspecified | other | unknown | processor | disk_or_disk_bay | peripheral_bay | system_management_module | system_board | memory_module | processor_module | power_supply | add_in_card | front_panel_board | back_panel_board | power_system_board | drive_backplane | system_internal_expansion_board | other_system_board | processor_board | power_unit | power_module | power_management | chassis_back_panel_board | system_chassis | sub_chassis | other_chassis_board | disk_drive_bay | peripheral_bay | device_bay | cooling_device | cooling_unit | interconnect | memory_device | system_management_software | system_firmware | operating_system | system_bus | group | remote_management_communication_device | external_environment | battery | processing_blade | connectivity_switch | processor_memory_module | io_module | processor_io_module | management_controller_firmware | ipmi_channel | pci_bus | pci_expresstm_bus | scsi_bus | sata_bus | front_side_bus | real_time_clock | air_inlet | air_inlet | processor | main_system_board | non_neg_integer()</tt></p>
+<p><tt>entity_id() = unspecified | other | unknown | processor | disk_or_disk_bay | peripheral_bay | system_management_module | system_board | memory_module | processor_module | power_supply | add_in_card | front_panel_board | back_panel_board | power_system_board | drive_backplane | system_internal_expansion_board | other_system_board | processor_board | power_unit | power_module | power_management | chassis_back_panel_board | system_chassis | sub_chassis | other_chassis_board | disk_drive_bay | peripheral_bay | device_bay | cooling_device | cooling_unit | interconnect | memory_device | system_management_software | system_firmware | operating_system | system_bus | group | remote_management_communication_device | external_environment | battery | processing_blade | connectivity_switch | processor_memory_module | io_module | processor_io_module | management_controller_firmware | ipmi_channel | pci_bus | pci_expresstm_bus | scsi_bus | sata_bus | front_side_bus | real_time_clock | air_inlet | air_inlet | processor | main_system_board | front_board | amc | mch | shelf_management_controller | filtration_unit | shelf_fru_information | alarm_panel | non_neg_integer()</tt></p>
 
 
 <h3 class="typedecl"><a name="type-type">type()</a></h3>
-<p><tt>type() = threshold | dmi_usage | state | predictive_failure | limit | performance | severity | availability | redundancy | acpi_power_state | temperature | voltage | current | fan | intrusion | violation_attempt | processor | power_supply | power_unit | cooling_unit | other_unit | memory | drive_slot | post_memory_resize | system_firmware | event_logging | watchdog_old | system_event | critical_interrupt | switch | board | microcontroller | add_in_card | chassis | chip_set | other_fru | interconnect | terminator | system_boot | boot_error | os_boot | os_shutdown | slot | system_acpi_power_state | watchdog | platform_alert | entity_presence | monitor_asic_ic | lan | management_subsystem_health | battery | session | version | fru_state | non_neg_integer()</tt></p>
+<p><tt>type() = threshold | dmi_usage | state | predictive_failure | limit | performance | severity | availability0 | availability1 | availability2 | redundancy | acpi_power_state | temperature | voltage | current | fan | intrusion | violation_attempt | processor | power_supply | power_unit | cooling_unit | other_unit | memory | drive_slot | post_memory_resize | system_firmware | event_logging | watchdog_old | system_event | critical_interrupt | switch | board | microcontroller | add_in_card | chassis | chip_set | other_fru | interconnect | terminator | system_boot | boot_error | os_boot | os_shutdown | slot | system_acpi_power_state | watchdog | platform_alert | entity_presence | monitor_asic_ic | lan | management_subsystem_health | battery | session | version | fru_state | fru_hot_swap | ipmb_physical | module_hot_swap | power_channel | telco_alarm | non_neg_integer()</tt></p>
 
 
 <h3 class="typedecl"><a name="type-unit">unit()</a></h3>
@@ -52,13 +52,9 @@
 <tr><td valign="top"><a href="#get_entity_id-1">get_entity_id/1</a></td><td>
   Returns the human readable entity for a given entity id according to
   section 43.14 from the IPMI specification.</td></tr>
-<tr><td valign="top"><a href="#get_reading-2">get_reading/2</a></td><td>
+<tr><td valign="top"><a href="#get_type-2">get_type/2</a></td><td>
   Returns the sensor category and reading type from the given sensor and
   reading type.</td></tr>
-<tr><td valign="top"><a href="#get_type-1">get_type/1</a></td><td>
-  Returns the type of sensor according to the given sensor reading type which
-  is actually the second parameter of the result tuple returned by
-  <a href="#get_reading-2"><code>get_reading/2</code></a>.</td></tr>
 <tr><td valign="top"><a href="#get_unit-1">get_unit/1</a></td><td>
   Returns the sensor unit from the given type code according to section 43.17
   from the IPMI specification.</td></tr>
@@ -90,21 +86,13 @@
   section 43.14 from the IPMI specification. For full entity decoding refer to
   <a href="#get_entity-2"><code>get_entity/2</code></a>.</p>
 
-<h3 class="function"><a name="get_reading-2">get_reading/2</a></h3>
+<h3 class="function"><a name="get_type-2">get_type/2</a></h3>
 <div class="spec">
-<p><tt>get_reading(ReadingType, SensorType) -&gt; any()</tt></p>
+<p><tt>get_type(ReadingType::non_neg_integer(), SensorType::non_neg_integer()) -&gt; {threshold | discrete | {oem, non_neg_integer()}, <a href="#type-type">type()</a>}</tt><br></p>
 </div><p>
   Returns the sensor category and reading type from the given sensor and
   reading type. See sections 41 and 42 of the IPMI specification for more
   information.</p>
-
-<h3 class="function"><a name="get_type-1">get_type/1</a></h3>
-<div class="spec">
-<p><tt>get_type(X1::{threshold | generic | specific | term(), non_neg_integer()}) -&gt; [{sensor_type, <a href="#type-type">type()</a>}]</tt><br></p>
-</div><p>
-  Returns the type of sensor according to the given sensor reading type which
-  is actually the second parameter of the result tuple returned by
-  <a href="#get_reading-2"><code>get_reading/2</code></a>.</p>
 
 <h3 class="function"><a name="get_unit-1">get_unit/1</a></h3>
 <div class="spec">
@@ -115,13 +103,13 @@
 
 <h3 class="function"><a name="get_value-5">get_value/5</a></h3>
 <div class="spec">
-<p><tt>get_value(Type::{threshold | generic | specific | term(), non_neg_integer()}, Offset::non_neg_integer(), Assertion::0 | 1, Value1::0..255, Value2::0..255) -&gt; [<a href="#type-value">value()</a>]</tt><br></p>
+<p><tt>get_value(Type::<a href="#type-type">type()</a>, Offset::non_neg_integer(), Assertion::0 | 1, Value1::0..255, Value2::0..255) -&gt; [<a href="#type-value">value()</a>]</tt><br></p>
 </div><p>
   Returns a (raw) sensor reading. The returned reading may have to be converted
   into human readable values (at least for threshold based sensors).</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Dec 3 2012, 11:33:42.</i></p>
+<p><i>Generated by EDoc, Dec 6 2012, 13:15:26.</i></p>
 </body>
 </html>
