@@ -11,8 +11,8 @@ to implement the remote console part of the IPMI LAN interface, as specified
 provide a low threshold for learning and using EIPMI, aiming to make it fit well
 with other Erlang/OTP concepts and solutions.
 
-<li> Code: http://github.com/lindenbaum/eipmi</li>
-<li> EDoc: http://lindenbaum.github.com/eipmi</li>
+<li> <a href="http://github.com/lindenbaum/eipmi">Code</a></li>
+<li> <a href="http://lindenbaum.github.com/eipmi">EDoc</a></li>
 
 === Initial planned features ===
 
