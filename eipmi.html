@@ -49,11 +49,11 @@ callback as well as the top level supervisor.</p>
 
 
 <h3 class="typedecl"><a name="type-option">option()</a></h3>
-<p><tt>option() = {clear_sel, boolean()} | {initial_outbound_seq_nr, non_neg_integer()} | {keep_alive_retransmits, non_neg_integer()} | {password, string()} | {poll_sel, integer()} | {port, <a href="inet.html#type-port_number">inet:port_number()</a>} | {privilege, <a href="#type-privilege">privilege()</a>} | {rq_addr, 129..141} | {timeout, non_neg_integer()} | {user, string()}</tt></p>
+<p><tt>option() = {initial_outbound_seq_nr, non_neg_integer()} | {keep_alive_retransmits, non_neg_integer()} | {password, string()} | {port, <a href="inet.html#type-port_number">inet:port_number()</a>} | {privilege, <a href="#type-privilege">privilege()</a>} | {rq_addr, 129..141} | {timeout, non_neg_integer()} | {user, string()}</tt></p>
 
 
 <h3 class="typedecl"><a name="type-option_name">option_name()</a></h3>
-<p><tt>option_name() = clear_sel | initial_outbound_seq_nr | keep_alive_retransmits | password | poll_sel | port | privilege | rq_addr | timeout | user</tt></p>
+<p><tt>option_name() = initial_outbound_seq_nr | keep_alive_retransmits | password | port | privilege | rq_addr | timeout | user</tt></p>
 
 
 <h3 class="typedecl"><a name="type-picmg_address_info">picmg_address_info()</a></h3>
@@ -186,13 +186,6 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
   Same as <a href="#open-1"><code>open/1</code></a> but allows the specification of the following custom
   options:
   <dl>
-    <dt><code>{clear_sel, boolean()}</code></dt>
-    <dd>
-      <p>
-      Indicates whether the System Event Log is to be cleared after read when
-      SEL polling is enabled using <code>poll_sel</code>, default is <code>true</code>.
-      </p>
-   </dd>
     <dt><code>{initial_outbound_seq_nr, non_neg_integer()}</code></dt>
     <dd>
       <p>
@@ -212,17 +205,6 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
       <p>
       A password string used for authentication when anonymous login is not
       available, default is <code>""</code>.
-      </p>
-    </dd>
-    <dt><code>{poll_sel, integer()}</code></dt>
-    <dd>
-      <p>
-      Enables/disable automatic polling of the System Event Log (SEL). When
-      polling is enabled the SEL will periodically be read and all events will
-      be forwarded to the subscribed event handlers registered with
-      <a href="#subscribe-2"><code>subscribe/2</code></a>. The provided integer will be used as timeout value
-      in milliseconds. A zero or negative value will disable automatic SEL
-      polling, default is <code>0</code> (disabled).
       </p>
     </dd>
     <dt><code>{port, inet:port_number()}</code></dt>
@@ -265,6 +247,12 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
 <tr><td valign="top"><a href="#ping-2">ping/2</a></td><td>
   Same as <a href="#ping-1"><code>ping/1</code></a> but allows the specification of a custom receive
   timeout value in milliseconds.</td></tr>
+<tr><td valign="top"><a href="#poll_sel-1">poll_sel/1</a></td><td>
+  Will start a dedicated server that polls the system event log using a
+  specific session every 500ms.</td></tr>
+<tr><td valign="top"><a href="#poll_sel-3">poll_sel/3</a></td><td>
+  Basically the same as <a href="#poll_sel-1"><code>poll_sel/1</code></a> but allows the specification of the
+  <code>Interval</code> and <code>Clear</code> options.</td></tr>
 <tr><td valign="top"><a href="#raw-4">raw/4</a></td><td>
   Sends a raw IPMI command over a given session.</td></tr>
 <tr><td valign="top"><a href="#read_fru-2">read_fru/2</a></td><td>
@@ -500,13 +488,6 @@ required.</p>
   Same as <a href="#open-1"><code>open/1</code></a> but allows the specification of the following custom
   options:
   <dl>
-    <dt><code>{clear_sel, boolean()}</code></dt>
-    <dd>
-      <p>
-      Indicates whether the System Event Log is to be cleared after read when
-      SEL polling is enabled using <code>poll_sel</code>, default is <code>true</code>.
-      </p>
-   </dd>
     <dt><code>{initial_outbound_seq_nr, non_neg_integer()}</code></dt>
     <dd>
       <p>
@@ -526,17 +507,6 @@ required.</p>
       <p>
       A password string used for authentication when anonymous login is not
       available, default is <code>""</code>.
-      </p>
-    </dd>
-    <dt><code>{poll_sel, integer()}</code></dt>
-    <dd>
-      <p>
-      Enables/disable automatic polling of the System Event Log (SEL). When
-      polling is enabled the SEL will periodically be read and all events will
-      be forwarded to the subscribed event handlers registered with
-      <a href="#subscribe-2"><code>subscribe/2</code></a>. The provided integer will be used as timeout value
-      in milliseconds. A zero or negative value will disable automatic SEL
-      polling, default is <code>0</code> (disabled).
       </p>
     </dd>
     <dt><code>{port, inet:port_number()}</code></dt>
@@ -591,6 +561,28 @@ required.</p>
 </div><p>
   Same as <a href="#ping-1"><code>ping/1</code></a> but allows the specification of a custom receive
   timeout value in milliseconds.</p>
+
+<h3 class="function"><a name="poll_sel-1">poll_sel/1</a></h3>
+<div class="spec">
+<p><tt>poll_sel(Session::<a href="#type-session">session()</a>) -&gt; {ok, pid()} | {error, term()}</tt><br></p>
+</div><p><p>
+  Will start a dedicated server that polls the system event log using a
+  specific session every 500ms. When polling is enabled the SEL will
+  periodically be read and all events will be forwarded to the subscribed event
+  handlers registered with <a href="#subscribe-2"><code>subscribe/2</code></a>.</p>
+ 
+  The automatic polling can be stopped by shutting down or exiting the returned
+  process. The process will exit automatically when its corresponding session
+  is closed or has errors.</p>
+
+<h3 class="function"><a name="poll_sel-3">poll_sel/3</a></h3>
+<div class="spec">
+<p><tt>poll_sel(Session::<a href="#type-session">session()</a>, Interval::non_neg_integer(), Clear::boolean()) -&gt; {ok, pid()} | {error, term()}</tt><br></p>
+</div><p>
+  Basically the same as <a href="#poll_sel-1"><code>poll_sel/1</code></a> but allows the specification of the
+  <code>Interval</code> and <code>Clear</code> options. While <code>Interval</code> specifies the minimum
+  interval between two consecutive SEL reads the <code>Clear</code> flag indicates whether
+  the SEL should be cleared after a read.</p>
 
 <h3 class="function"><a name="raw-4">raw/4</a></h3>
 <div class="spec">
@@ -802,6 +794,6 @@ required.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Dec 11 2012, 14:49:43.</i></p>
+<p><i>Generated by EDoc, Dec 14 2012, 09:19:30.</i></p>
 </body>
 </html>
