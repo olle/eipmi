@@ -148,13 +148,6 @@ The session received an invalid message.
 {ipmi,
  Session &#183; eipmi:session(),
  Address &#183; inet:ip_address() | inet:hostname(),
- {unhandled, {ipmi, {ok | error, term()}}}}
-'''
-The session received an IPMI response but no handler was found for it.
-```
-{ipmi,
- Session &#183; eipmi:session(),
- Address &#183; inet:ip_address() | inet:hostname(),
  SELEntry &#183; eipmi:sel_entry()}
 '''
 A forwarded entry from the System Event Log (only when automatic SEL polling is
