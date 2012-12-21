@@ -133,13 +133,21 @@ callback as well as the top level supervisor.</p>
 
 
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#clear_sel-1">clear_sel/1</a></td><td>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_handler-2">add_handler/2</a></td><td>
+  Registers/adds a handler for session related events.</td></tr>
+<tr><td valign="top"><a href="#add_sup_handler-2">add_sup_handler/2</a></td><td>
+  Basically the same than <a href="#add_handler-2"><code>add_handler/2</code></a> but with supervised
+  subscription as described by <a href="gen_event.html#add_sup_handler-3"><code>gen_event:add_sup_handler/3</code></a>.</td></tr>
+<tr><td valign="top"><a href="#clear_sel-1">clear_sel/1</a></td><td>
   Clears all current records from the System Event Log (SEL).</td></tr>
 <tr><td valign="top"><a href="#close-1">close/1</a></td><td>
   Closes an IPMI session previously opened with <a href="#open-1"><code>open/1</code></a> or
   <a href="#open-2"><code>open/2</code></a>.</td></tr>
 <tr><td valign="top"><a href="#cold_reset-1">cold_reset/1</a></td><td>
   Will issue a 'Cold Reset' request using the provided session.</td></tr>
+<tr><td valign="top"><a href="#delete_handler-2">delete_handler/2</a></td><td>
+  Unregisters/removes a handler for session related events previously added
+  using <a href="#add_handler-2"><code>add_handler/2</code></a> or <a href="#add_sup_handler-2"><code>add_sup_handler/2</code></a>.</td></tr>
 <tr><td valign="top"><a href="#fru_control-3">fru_control/3</a></td><td>
   Will issue a PICMG 'FRU Control' request using the provided session.</td></tr>
 <tr><td valign="top"><a href="#get_acpi_power_state-1">get_acpi_power_state/1</a></td><td>
@@ -293,16 +301,113 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
 <tr><td valign="top"><a href="#stats-0">stats/0</a></td><td>
   Returns statistical information about the currently opened sessions and the
   registered event handlers.</td></tr>
-<tr><td valign="top"><a href="#subscribe-2">subscribe/2</a></td><td>
-  Registers/adds a handler for session related events.</td></tr>
-<tr><td valign="top"><a href="#unsubscribe-2">unsubscribe/2</a></td><td>
-  Unregisters/removes a handler for session related events previously added
-  using <a href="#subscribe-2"><code>subscribe/2</code></a>.</td></tr>
 <tr><td valign="top"><a href="#warm_reset-1">warm_reset/1</a></td><td>
   Will issue a 'Warm Reset' request using the provided session.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="add_handler-2">add_handler/2</a></h3>
+<div class="spec">
+<p><tt>add_handler(Handler::module() | {module(), term()}, Args::term()) -&gt; ok | {error, term()}</tt><br></p>
+</div><p>
+  Registers/adds a handler for session related events. The handler module must
+  implement the <a href="gen_event.html"><code>gen_event</code></a> behaviour. For more information on the
+  arguments <code>Handler</code> and <code>Args</code> refer to <a href="gen_event.html#add_handler-3"><code>gen_event:add_handler/3</code></a>.
+  The event handling module should be prepared to receive the following events
+  on the <code>handle_event/2</code> callback:
+  <dl>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        established}</code>
+    </dt>
+    <dd>
+      <p>the session was successfully established and activated</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        {closed, Reason :: term()}}</code>
+    </dt>
+    <dd>
+      <p>the session was closed with the provided reason</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        {decode_error, Reason :: term()}}</code>
+    </dt>
+    <dd>
+      <p>a received packet could not be decoded</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        {timeout, RqSeqNr :: 0..63}}</code>
+    </dt>
+    <dd>
+      <p>the corresponding request timed out</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        {unhandled, {call, term()}}}</code>
+    </dt>
+    <dd>
+      <p>the session received an invalid <code>gen_server</code> call</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        {unhandled, {cast, term()}}}</code>
+    </dt>
+    <dd>
+      <p>the session received an invalid <code>gen_server</code> cast</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        {unhandled, {info, term()}}}</code>
+    </dt>
+    <dd>
+      <p>the session received an invalid message</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        {unhandled, {ipmi, {ok | error, term()}}}}</code>
+    </dt>
+    <dd>
+      <p>the session received an IPMI response but no handler was found for it</p>
+    </dd>
+    <dt>
+      <code>{ipmi,
+        Session :: session(),
+        Address :: inet:ip_address() | inet:hostname(),
+        SELEntry :: sel_entry()}</code>
+    </dt>
+    <dd>
+      <p>
+        a SEL event forwarded through the automatic SEL polling mechanism
+      </p>
+    </dd>
+  </dl></p>
+
+<h3 class="function"><a name="add_sup_handler-2">add_sup_handler/2</a></h3>
+<div class="spec">
+<p><tt>add_sup_handler(Handler::module() | {module(), term()}, Args::term()) -&gt; ok | {error, term()}</tt><br></p>
+</div><p>
+  Basically the same than <a href="#add_handler-2"><code>add_handler/2</code></a> but with supervised
+  subscription as described by <a href="gen_event.html#add_sup_handler-3"><code>gen_event:add_sup_handler/3</code></a>.</p>
 
 <h3 class="function"><a name="clear_sel-1">clear_sel/1</a></h3>
 <div class="spec">
@@ -324,6 +429,14 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
 </div><p>
   Will issue a 'Cold Reset' request using the provided session. This will
   perform a power cycle of the connected device!</p>
+
+<h3 class="function"><a name="delete_handler-2">delete_handler/2</a></h3>
+<div class="spec">
+<p><tt>delete_handler(Handler::module() | {module(), term()}, Args::term()) -&gt; term()</tt><br></p>
+</div><p>
+  Unregisters/removes a handler for session related events previously added
+  using <a href="#add_handler-2"><code>add_handler/2</code></a> or <a href="#add_sup_handler-2"><code>add_sup_handler/2</code></a>. For more
+  information refer to on the arguments <a href="gen_event.html#delete_handler-3"><code>gen_event:delete_handler/3</code></a>.</p>
 
 <h3 class="function"><a name="fru_control-3">fru_control/3</a></h3>
 <div class="spec">
@@ -579,7 +692,7 @@ required.</p>
   Will start a dedicated server that polls the system event log using a
   specific session every 500ms. When polling is enabled the SEL will
   periodically be read and all events will be forwarded to the subscribed event
-  handlers registered with <a href="#subscribe-2"><code>subscribe/2</code></a>.</p>
+  handlers registered with <a href="#add_handler-2"><code>add_handler/2</code></a> or <a href="#add_sup_handler-3"><code>add_sup_handler/3</code></a>.</p>
  
   The automatic polling can be stopped by shutting down or exiting the returned
   process. The process will exit automatically when its corresponding session
@@ -701,109 +814,6 @@ required.</p>
   Returns statistical information about the currently opened sessions and the
   registered event handlers.</p>
 
-<h3 class="function"><a name="subscribe-2">subscribe/2</a></h3>
-<div class="spec">
-<p><tt>subscribe(Handler::module() | {module(), term()}, Args::term()) -&gt; ok | {error, term()}</tt><br></p>
-</div><p>
-  Registers/adds a handler for session related events. The handler module must
-  implement the <a href="gen_event.html"><code>gen_event</code></a> behaviour. For more information on the
-  arguments <code>Handler</code> and <code>Args</code> refer to <a href="gen_event.html#add_handler-3"><code>gen_event:add_handler/3</code></a>.
-  The event handling module should be prepared to receive the following events
-  on the <code>handle_event/2</code> callback:
-  <dl>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        established}</code>
-    </dt>
-    <dd>
-      <p>the session was successfully established and activated</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        {closed, Reason :: term()}}</code>
-    </dt>
-    <dd>
-      <p>the session was closed with the provided reason</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        {decode_error, Reason :: term()}}</code>
-    </dt>
-    <dd>
-      <p>a received packet could not be decoded</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        {timeout, RqSeqNr :: 0..63}}</code>
-    </dt>
-    <dd>
-      <p>the corresponding request timed out</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        {unhandled, {call, term()}}}</code>
-    </dt>
-    <dd>
-      <p>the session received an invalid <code>gen_server</code> call</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        {unhandled, {cast, term()}}}</code>
-    </dt>
-    <dd>
-      <p>the session received an invalid <code>gen_server</code> cast</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        {unhandled, {info, term()}}}</code>
-    </dt>
-    <dd>
-      <p>the session received an invalid message</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        {unhandled, {ipmi, {ok | error, term()}}}}</code>
-    </dt>
-    <dd>
-      <p>the session received an IPMI response but no handler was found for it</p>
-    </dd>
-    <dt>
-      <code>{ipmi,
-        Session :: session(),
-        Address :: inet:ip_address() | inet:hostname(),
-        SELEntry :: sel_entry()}</code>
-    </dt>
-    <dd>
-      <p>
-        a SEL event forwarded through the automatic SEL polling mechanism
-      </p>
-    </dd>
-  </dl></p>
-
-<h3 class="function"><a name="unsubscribe-2">unsubscribe/2</a></h3>
-<div class="spec">
-<p><tt>unsubscribe(Handler::module() | {module(), term()}, Args::term()) -&gt; term()</tt><br></p>
-</div><p>
-  Unregisters/removes a handler for session related events previously added
-  using <a href="#subscribe-2"><code>subscribe/2</code></a>. For more information refer to on the arguments
-  <a href="gen_event.html#delete_handler-3"><code>gen_event:delete_handler/3</code></a>.</p>
-
 <h3 class="function"><a name="warm_reset-1">warm_reset/1</a></h3>
 <div class="spec">
 <p><tt>warm_reset(Session::<a href="#type-session">session()</a>) -&gt; ok | {error, term()}</tt><br></p>
@@ -813,6 +823,6 @@ required.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Dec 19 2012, 09:11:34.</i></p>
+<p><i>Generated by EDoc, Dec 21 2012, 12:34:45.</i></p>
 </body>
 </html>
