@@ -157,14 +157,11 @@ enabled).
 === Building ===
 
 If you are using <a href="http://github.com/basho/rebar">rebar</a> to build your project
-and want to use EIPMI just specify it as a dependency in your <code>rebar.config</code>.
-Please note that the below link will change in the future as soon as EIPMI gets
-released for the first time. Do not use non-released (untagged) versions in
-production environments!
+and want to use EIPMI just drop the following line into the <code>deps</code> section of
+your <code>rebar.config</code>:
 
 ```
-{deps,
- [{eipmi, "1.0.0", {git, "https://github.com/lindenbaum/eipmi.git"}}]}.
+{eipmi, "1.0.0", {git, "https://github.com/lindenbaum/eipmi.git", {tag, "1.0.0"}}}
 '''
 
 === Usage ===

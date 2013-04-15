@@ -1,3 +1,4 @@
+%% encoding: UTF-8
 {application,eipmi}.
 {packages,[]}.
 {modules,[eipmi,eipmi_auth,eipmi_decoder,eipmi_encoder,eipmi_events,eipmi_fru,
