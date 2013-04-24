@@ -85,16 +85,16 @@ callback as well as the top level supervisor.</p>
 
 
 <h3 class="typedecl"><a name="type-req_net_fn">req_net_fn()</a></h3>
-<p><tt>req_net_fn() = '?IPMI_NETFN_SENSOR_EVENT_REQUEST' | '?IPMI_NETFN_APPLICATION_REQUEST' | '?IPMI_NETFN_STORAGE_REQUEST' | '?IPMI_NETFN_TRANSPORT_REQUEST' | '?IPMI_NETFN_PICMG_REQUEST'</tt></p>
-
+<p><tt>req_net_fn() = 0..62</tt></p>
+<p>  0x00-0x3e</p>
 
 <h3 class="typedecl"><a name="type-request">request()</a></h3>
 <p><tt>request() = {<a href="#type-req_net_fn">req_net_fn()</a>, Command::0..255}</tt></p>
 
 
 <h3 class="typedecl"><a name="type-resp_net_fn">resp_net_fn()</a></h3>
-<p><tt>resp_net_fn() = '?IPMI_NETFN_SENSOR_EVENT_RESPONSE' | '?IPMI_NETFN_APPLICATION_RESPONSE' | '?IPMI_NETFN_STORAGE_RESPONSE' | '?IPMI_NETFN_TRANSPORT_RESPONSE' | '?IPMI_NETFN_PICMG_RESPONSE'</tt></p>
-
+<p><tt>resp_net_fn() = 1..63</tt></p>
+<p>  0x01-0xef</p>
 
 <h3 class="typedecl"><a name="type-response">response()</a></h3>
 <p><tt>response() = {<a href="#type-resp_net_fn">resp_net_fn()</a>, Command::0..255}</tt></p>
@@ -190,6 +190,8 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
   Will issue a 'Get Self Test Results' request using the provided session.</td></tr>
 <tr><td valign="top"><a href="#get_system_guid-1">get_system_guid/1</a></td><td>
   Will issue a 'Get System GUID' request using the provided session.</td></tr>
+<tr><td valign="top"><a href="#oem-4">oem/4</a></td><td>
+  Sends an OEM specific IPMI command over a given session.</td></tr>
 <tr><td valign="top"><a href="#open-1">open/1</a></td><td>
   Opens an IPMI session to a given host.</td></tr>
 <tr><td valign="top"><a href="#open-2">open/2</a></td><td>
@@ -288,6 +290,9 @@ Return all currently available entries from the System Event Log (SEL).</td></tr
 <tr><td valign="top"><a href="#sel_to_sdr-2">sel_to_sdr/2</a></td><td>
   Returns the Sensor Data Record (SDR) from the SDR repository associated with
   an entry in the System Event Log (SEL), if any.</td></tr>
+<tr><td valign="top"><a href="#send_message-6">send_message/6</a></td><td>
+  Will issue a 'Send Message' request to the specified device (addr/lun)
+  located behind the BMC on the primary IPMB.</td></tr>
 <tr><td valign="top"><a href="#set_fru_activation-3">set_fru_activation/3</a></td><td>
   Will issue a PICMG 'Set FRU Activation' request using the provided session.</td></tr>
 <tr><td valign="top"><a href="#set_fru_activation_policy-3">set_fru_activation_policy/3</a></td><td>
@@ -590,6 +595,14 @@ argument the SEL can optionally be cleared after reading.</p>
 </div><p>
   Will issue a 'Get System GUID' request using the provided session.</p>
 
+<h3 class="function"><a name="oem-4">oem/4</a></h3>
+<div class="spec">
+<p><tt>oem(Session::<a href="#type-session">session()</a>, NetFn::<a href="#type-req_net_fn">req_net_fn()</a>, Command::0..255, Binary::binary()) -&gt; ok | {ok, binary()} | {error, term()}</tt><br></p>
+</div><p>
+  Sends an OEM specific IPMI command over a given session. DO NOT USE THIS
+  unless you really know what you're doing! The request data has to be given as
+  binary, the response will also be provided in binary format.</p>
+
 <h3 class="function"><a name="open-1">open/1</a></h3>
 <div class="spec">
 <p><tt>open(IPAddress::<a href="inet.html#type-ip_address">inet:ip_address()</a> | <a href="inet.html#type-hostname">inet:hostname()</a>) -&gt; {ok, <a href="eipmi.html#type-session">eipmi:session()</a>} | {error, term()}</tt><br></p>
@@ -775,6 +788,15 @@ required.</p>
   Returns the Sensor Data Record (SDR) from the SDR repository associated with
   an entry in the System Event Log (SEL), if any.</p>
 
+<h3 class="function"><a name="send_message-6">send_message/6</a></h3>
+<div class="spec">
+<p><tt>send_message(Session::<a href="#type-session">session()</a>, TargetAddr::0..255, TargetLun::0..4, NetFn::<a href="#type-req_net_fn">req_net_fn()</a>, Command::0..255, Properties::<a href="proplists.html#type-proplist">proplists:proplist()</a>) -&gt; ok | {ok, <a href="proplists.html#type-proplist">proplists:proplist()</a>} | {error, term()}</tt><br></p>
+</div><p>
+  Will issue a 'Send Message' request to the specified device (addr/lun)
+  located behind the BMC on the primary IPMB. The contained request has to be
+  given in <code>raw</code> format.</p>
+<p><b>See also:</b> <a href="#raw-4">raw/4</a>.</p>
+
 <h3 class="function"><a name="set_fru_activation-3">set_fru_activation/3</a></h3>
 <div class="spec">
 <p><tt>set_fru_activation(Session::<a href="#type-session">session()</a>, FruId::0..254, Activate::boolean()) -&gt; ok | {error, term()}</tt><br></p>
@@ -823,6 +845,6 @@ required.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Apr 15 2013, 15:55:38.</i></p>
+<p><i>Generated by EDoc, Apr 24 2013, 14:05:10.</i></p>
 </body>
 </html>
